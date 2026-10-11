@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<!-- saved from url=(0112)file:///Users/linja/Library/Mobile%20Documents/com~apple~CloudDocs/Codex/english-reading-ip-prototype/index.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语阅读旅伴原型</title>
+<style>
+  :root {
+    --paper:#F4E7D1; --paper-2:#FFF9EE; --paper-3:#E9D6B9;
+    --ink:#2B221C; --brown:#684B35; --brown-2:#8A664C;
+    --teal:#42AFA8; --coral:#D8674C; --amber:#E3A542;
+    --line:#D7C1A2; --muted:#8A7765; --white:#FFFCF6;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#242220;font-family:"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+  body{display:flex;flex-wrap:wrap;gap:48px;padding:48px;align-items:flex-start}
+  .screen{position:relative;width:390px;height:844px;overflow:hidden;background:var(--paper);border-radius:28px;box-shadow:0 24px 56px rgba(0,0,0,.28)}
+  .grain{position:absolute;inset:0;pointer-events:none;opacity:.12;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E")}
+  .content{position:relative;z-index:2;padding:26px 22px 24px;height:100%}
+  .status{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;margin-bottom:24px}
+  .eyebrow{font-size:11px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:var(--brown-2)}
+  h1{font-size:29px;line-height:1.23;margin:10px 0 8px;letter-spacing:-.7px}
+  h2{font-size:22px;line-height:1.3;margin:8px 0}
+  h3{font-size:16px;line-height:1.35;margin:0}
+  p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+  .row{display:flex;align-items:center}.space{justify-content:space-between}.gap8{gap:8px}.gap12{gap:12px}.gap16{gap:16px}
+  .pill{display:inline-flex;align-items:center;border:1px solid var(--line);background:rgba(255,252,246,.72);padding:8px 12px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap}
+  .pill.on{background:var(--brown);color:#fff;border-color:var(--brown)}
+  .progress{height:5px;background:#DCC9AD;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:var(--teal);border-radius:99px}
+  .button{height:52px;border-radius:16px;background:var(--brown);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;letter-spacing:.2px;box-shadow:0 7px 0 #4B3324}
+  .button.light{background:var(--paper-2);color:var(--brown);border:1px solid var(--line);box-shadow:none}
+  .button.teal{background:var(--teal);box-shadow:0 7px 0 #287D78}
+  .bottom-cta{position:absolute;left:22px;right:22px;bottom:26px}
+  .back{width:34px;height:34px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.45);font-weight:900}
+  .card{background:rgba(255,249,238,.86);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 6px 0 rgba(104,75,53,.08)}
+  .stamp{display:inline-block;background:var(--coral);color:white;font-size:10px;font-weight:900;letter-spacing:1px;padding:5px 8px;transform:rotate(-3deg);border-radius:4px}
+  .avatar{object-fit:contain;display:block}
+  .nav{position:absolute;z-index:3;left:18px;right:18px;bottom:18px;height:62px;background:rgba(255,249,238,.96);border:1px solid var(--line);border-radius:22px;display:flex;justify-content:space-around;align-items:center;box-shadow:0 10px 25px rgba(77,50,33,.14)}
+  .nav-item{text-align:center;font-size:10px;color:var(--muted);font-weight:700}.nav-item b{display:block;font-size:19px;line-height:20px;color:var(--brown)}.nav-item.on{color:var(--brown)}
+
+  /* S1 */
+  .companion-strip{display:flex;gap:10px;margin-top:22px}
+  .companion{position:relative;width:108px;height:320px;border-radius:22px;border:1px solid var(--line);background:var(--paper-2);padding:14px 10px;overflow:hidden;transition:.2s}
+  .companion.selected{width:138px;border:2px solid var(--brown);background:#FFF5E3;box-shadow:0 9px 0 rgba(104,75,53,.16)}
+  .companion img{width:100%;height:154px;object-fit:contain;margin:0 auto 8px}
+  .companion.selected img{height:170px}
+  .companion .quote{font-size:11px;line-height:1.45;color:var(--muted);margin-top:7px}
+  .companion .type{font-size:10px;font-weight:800;color:var(--teal);margin-top:5px}
+  .check{position:absolute;right:10px;top:10px;width:22px;height:22px;border-radius:50%;background:var(--brown);color:#fff;display:grid;place-items:center;font-size:12px}
+  .scribble{position:absolute;border:2px solid var(--coral);border-radius:50%;width:120px;height:46px;right:-10px;top:85px;transform:rotate(-8deg);opacity:.6}
+
+  /* Chat */
+  .chat-hero{height:152px;position:relative;margin-top:6px}.chat-hero img{position:absolute;width:142px;height:150px;object-fit:contain;right:-5px;bottom:-5px}.chat-hero .mini-map{position:absolute;left:0;top:20px;width:180px;height:90px;border-top:2px dashed var(--brown-2);border-radius:50%;transform:rotate(-8deg);opacity:.45}
+  .bubble{max-width:86%;padding:13px 15px;border-radius:18px;margin:10px 0;font-size:14px;line-height:1.48;border:1px solid var(--line)}
+  .bubble.ai{background:var(--paper-2);border-bottom-left-radius:5px}.bubble.me{margin-left:auto;background:var(--brown);color:white;border-color:var(--brown);border-bottom-right-radius:5px}
+  .quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.quick .pill{background:transparent}
+  .composer{position:absolute;left:22px;right:22px;bottom:24px;height:52px;border:1px solid var(--line);background:var(--paper-2);border-radius:18px;display:flex;align-items:center;padding:0 15px;color:var(--muted);font-size:13px}.send{margin-left:auto;width:32px;height:32px;border-radius:50%;background:var(--coral);color:#fff;display:grid;place-items:center;font-weight:900}
+
+  /* routes */
+  .route-stack{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+  .route{height:136px;display:flex;overflow:hidden;padding:0;background:var(--paper-2)}
+  .route-art{width:108px;position:relative;flex:none}.route-art:before,.route-art:after{content:"";position:absolute}
+  .mars{background:var(--coral)}.mars:before{width:62px;height:62px;border-radius:50%;background:#F5C170;left:23px;top:25px}.mars:after{width:74px;height:2px;background:var(--brown);left:17px;top:58px;transform:rotate(-13deg)}
+  .court{background:var(--teal)}.court:before{width:52px;height:52px;border:3px solid var(--paper-2);border-radius:50%;left:25px;top:33px}.court:after{width:3px;height:105px;background:var(--paper-2);left:51px;top:15px;transform:rotate(29deg)}
+  .npc{background:var(--brown)}.npc:before{width:56px;height:56px;background:var(--amber);left:27px;top:30px;clip-path:polygon(50% 0,100% 25%,82% 88%,18% 88%,0 25%)}.npc:after{width:8px;height:8px;background:var(--brown);border-radius:50%;left:43px;top:50px;box-shadow:21px 0 var(--brown)}
+  .route-copy{padding:15px 14px;display:flex;flex-direction:column;justify-content:center}.route-copy h3{font-size:15px;margin:4px 0 7px}.route-copy p{font-size:11px}.route-copy .meta{font-size:10px;font-weight:800;color:var(--coral)}
+
+  /* reading */
+  .reader{background:#FAEEDA}.reader .content{padding-left:25px;padding-right:25px}
+  .reader-title{font-family:Georgia,serif;font-size:25px;line-height:1.2;margin:20px 0 9px}.reading-meta{font-size:11px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:18px}
+  .article{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.72;color:#332820}.article p{font-family:inherit;font-size:17px;line-height:1.72;color:#332820;margin:0 0 15px}.mark{background:linear-gradient(transparent 55%,rgba(66,175,168,.4) 55%);font-weight:700}
+  .word-card{position:absolute;left:22px;right:22px;bottom:86px;background:var(--brown);color:#fff;border-radius:18px;padding:15px 16px;box-shadow:0 12px 30px rgba(45,28,17,.28)}.word-card b{font-family:Georgia,serif;font-size:20px}.word-card span{font-size:12px;color:#E9D8C1;margin-left:8px}.word-card p{color:#fff;font-size:12px;margin-top:5px}.reader-pal{position:absolute;right:9px;bottom:170px;width:72px;height:92px;object-fit:contain;filter:drop-shadow(0 5px 8px rgba(55,35,20,.2))}
+  .reader-toolbar{position:absolute;left:22px;right:22px;bottom:24px;height:48px;border-radius:16px;background:var(--paper-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:space-around;font-size:12px;font-weight:800;color:var(--brown)}
+
+  /* complete */
+  .complete{background:var(--brown);color:#fff}.complete .content{padding:28px}.complete p{color:#EBD9C0}.complete .progress{background:#88674E}.complete .growth-card{background:var(--paper);color:var(--ink);margin-top:22px;padding:18px;border-radius:24px;position:relative;height:300px;overflow:hidden}.complete .growth-card img{position:absolute;width:220px;height:250px;object-fit:contain;right:-24px;bottom:-35px}.coordinate{width:112px;height:112px;border-radius:50%;background:var(--coral);display:grid;place-items:center;margin:14px 0;color:#fff;position:relative}.coordinate:after{content:"";position:absolute;width:136px;height:38px;border:2px dashed var(--amber);border-radius:50%;transform:rotate(-14deg)}.coordinate strong{font-size:30px}.coordinate small{font-size:9px;display:block;letter-spacing:1px}.reward-list{position:absolute;left:18px;bottom:22px;display:flex;flex-direction:column;gap:7px;font-size:12px;font-weight:700}.reward-list i{width:9px;height:9px;display:inline-block;border-radius:50%;background:var(--teal);margin-right:8px}
+
+  /* profile */
+  .portrait-card{margin-top:18px;background:var(--brown);color:#fff;border-radius:24px;padding:20px;position:relative;overflow:hidden}.portrait-card:after{content:"";position:absolute;width:160px;height:160px;border:1px dashed #B69372;border-radius:50%;right:-45px;top:-35px}.portrait-card p{color:#E8D4BA}.meter{margin-top:16px}.meter-label{font-size:11px;display:flex;justify-content:space-between;margin-bottom:6px;color:#EEDFCB}.meter .progress{background:#876951}.meter .progress i{background:var(--amber)}
+  .service-list{margin-top:16px;display:flex;flex-direction:column;gap:9px}.service{display:flex;gap:12px;align-items:center;padding:12px;border-bottom:1px solid var(--line)}.service:last-child{border-bottom:0}.service .ico{width:34px;height:34px;border-radius:11px;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:900}.service p{font-size:11px}
+
+  /* station */
+  .station{background:#EEDFC5}.station-top{height:360px;background:var(--brown);border-radius:0 0 36px 36px;margin:-26px -22px 0;padding:28px 22px;color:#fff;position:relative;overflow:hidden}.station-top:before{content:"";position:absolute;inset:75px -30px -50px;background:repeating-linear-gradient(145deg,transparent 0 24px,rgba(255,255,255,.035) 24px 26px)}.station-top h1{margin-top:18px;font-size:27px}.station-top p{color:#E7D5BC}.station-pal{position:absolute;right:2px;bottom:-20px;width:210px;height:280px;object-fit:contain;filter:drop-shadow(0 14px 20px rgba(0,0,0,.25))}.map-line{position:absolute;left:20px;bottom:42px;width:190px;height:90px;border-top:2px dashed var(--amber);border-radius:50%;transform:rotate(-12deg)}.map-dot{position:absolute;width:12px;height:12px;background:var(--teal);border:3px solid #fff;border-radius:50%;left:46px;bottom:104px}.today{margin-top:18px}.story-cover{height:116px;border-radius:17px;background:var(--coral);position:relative;overflow:hidden;margin-bottom:12px}.story-cover:before{content:"";position:absolute;width:86px;height:86px;border-radius:50%;background:var(--amber);right:25px;top:15px}.story-cover:after{content:"47";position:absolute;color:var(--brown);font:bold 54px Georgia;right:36px;top:28px}.station .nav{bottom:14px}
+
+  /* weekly */
+  .weekly{background:var(--paper-2)}.week-hero{background:var(--teal);margin:-26px -22px 0;padding:28px 22px 22px;height:214px;color:#fff;position:relative;overflow:hidden}.week-hero p{color:#DDF5F1}.week-hero img{position:absolute;width:150px;height:170px;object-fit:contain;right:-8px;bottom:-28px}.week-columns{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:16px}.week-col{border:1px solid var(--line);border-radius:18px;padding:14px;background:var(--paper)}.week-col h3{font-size:14px;margin-bottom:10px}.week-col ul{margin:0;padding:0;list-style:none}.week-col li{font-size:11px;line-height:1.45;padding:7px 0;border-bottom:1px solid rgba(104,75,53,.12)}.week-col li:last-child{border:0}.week-col.you h3{color:var(--coral)}.week-col.it h3{color:var(--teal)}.quote-card{margin-top:13px;border-left:5px solid var(--amber);background:#F5E5C9;border-radius:6px 16px 16px 6px;padding:13px 14px;font-family:Georgia,"PingFang SC",serif;font-size:14px;line-height:1.5}
+</style>
+</head>
+<body>
+
+<section class="screen" id="screen-01">
+  <div class="grain"></div><div class="content">
+    <div class="status"><span>9:41</span><span>● ● ▰</span></div>
+    <div class="row space"><span class="eyebrow">页间旅站 · 初次见面</span><span class="pill">跳过</span></div>
+    <h1>读英文时，<br>你想让谁坐在旁边？</h1>
+    <p>选的是陪伴方式，不是考试模式。以后随时可以换。</p>
+    <div class="companion-strip">
+      <div class="companion selected"><div class="check">✓</div><img src="./英语阅读旅伴原型_files/pal.png"><h3>帕利 Pal</h3><div class="type">机灵型旅伴</div><div class="quote">“我会吐槽难句，<br>不吐槽你。”</div></div>
+      <div class="companion"><img src="./英语阅读旅伴原型_files/wick.png"><h3>灯芯 Wick</h3><div class="type">安静型旅伴</div><div class="quote">“你读你的，<br>我替你留灯。”</div></div>
+      <div class="companion"><img src="./英语阅读旅伴原型_files/nubo.png"><h3>努波 Nubo</h3><div class="type">活力型旅伴</div><div class="quote">“平时我很闹。<br>看正文时除外。”</div></div>
+    </div>
+    <div class="scribble"></div>
+    <div class="bottom-cta"><div class="button">让帕利陪我出发 →</div><div style="text-align:center;margin-top:12px;font-size:12px;color:var(--muted);font-weight:700">帮我随机选一个</div></div>
+  </div>
+</section>
+
+<section class="screen" id="screen-02">
+  <div class="grain"></div><div class="content">
+    <div class="status"><span>9:41</span><span>● ● ▰</span></div>
+    <div class="row space"><div class="back">←</div><span class="eyebrow">认识一下 · 1/3</span></div>
+    <div class="chat-hero"><div class="mini-map"></div><img src="./英语阅读旅伴原型_files/pal.png"></div>
+    <div class="bubble ai">先别告诉我英语几级。最近有什么东西能让你停不下来？</div>
+    <div class="bubble me">赛博朋克，还有 NBA 最后两分钟。</div>
+    <div class="bubble ai">懂了：未来城市，和会翻盘的故事。今晚先从哪个方向走？</div>
+    <div class="quick"><span class="pill on">未来城市</span><span class="pill">最后一投</span><span class="pill">都可以</span></div>
+    <div class="composer">继续说也可以…<span class="send">↑</span></div>
+  </div>
+</section>
+
+<section class="screen" id="screen-03">
+  <div class="grain"></div><div class="content">
+    <div class="status"><span>9:41</span><span>● ● ▰</span></div>
+    <div class="row space"><div class="back">←</div><span class="eyebrow">认识一下 · 2/3</span></div>
+    <h1>今晚先走哪条？</h1><p>别想难不难，只选你最想继续看的。</p>
+    <div class="route-stack">
+      <div class="card route"><div class="route-art mars"></div><div class="route-copy"><span class="meta">SCI-FI · 约 4 分钟</span><h3>火星城市停电的第 47 分钟</h3><p>所有系统都停止了，除了一个旧机器人。</p></div></div>
+      <div class="card route"><div class="route-art court"></div><div class="route-copy"><span class="meta">SPORT · 约 3 分钟</span><h3>最后 8 秒，他没有听教练的</h3><p>一次看似错误的决定，改变了整场比赛。</p></div></div>
+      <div class="card route"><div class="route-art npc"></div><div class="route-copy"><span class="meta">GAME · 约 5 分钟</span><h3>当 NPC 发现自己活在游戏里</h3><p>它第一次没有按照任务箭头前进。</p></div></div>
+    </div>
+    <div class="bottom-cta"><div class="button">读火星这篇 →</div></div>
+  </div>
+</section>
+
+<section class="screen reader" id="screen-04">
+  <div class="grain"></div><div class="content">
+    <div class="status"><span>9:41</span><span>● ● ▰</span></div>
+    <div class="row space"><div class="back">×</div><div style="width:190px" class="progress"><i style="width:36%"></i></div><span style="font-size:12px;font-weight:800">2:18</span></div>
+    <div class="reader-title">The 47th Minute<br>Without Power</div>
+    <div class="reading-meta">MARS CITY · A 4-MINUTE STORY</div>
+    <div class="article">
+      <p>At 21:47, every light in the city went out. The glass towers disappeared into the red dust.</p>
+      <p>Mara waited for the emergency system to start. Nothing happened. Then an old repair robot <span class="mark">emerged</span> from a tunnel under the street.</p>
+      <p>“I know another way,” it said. The route was longer, but it did not depend on the city’s network.</p>
+    </div>
+    <img class="reader-pal" src="./英语阅读旅伴原型_files/pal.png">
+    <div class="word-card"><div><b>emerged</b><span>/ɪˈmɜːrdʒd/</span></div><p>出现；从看不见的地方走出来</p></div>
+    <div class="reader-toolbar"><span>☼ 亮度</span><span>Aa 字号</span><span>▤ 拆句</span><span>↗ 问帕利</span></div>
+  </div>
+</section>
+
+<section class="screen complete" id="screen-05">
+  <div class="grain"></div><div class="content">
+    <div class="status"><span>9:41</span><span>● ● ▰</span></div>
+    <span class="stamp">ROUTE COMPLETE</span>
+    <h1>你读完了。<br>帕利也发生了变化。</h1>
+    <p>你的第一次火星阅读，给它留下了一段新路线。</p>
+    <div class="growth-card">
+      <span class="eyebrow">本次养成</span>
+      <div class="coordinate"><div><strong>47</strong><small>MARS COORDINATE</small></div></div>
+      <img src="./英语阅读旅伴原型_files/pal.png">
+      <div class="reward-list"><span><i></i>尾巴获得「火星坐标」</span><span><i style="background:var(--coral)"></i>收下新词 emerged</span><span><i style="background:var(--amber)"></i>更懂你的提示节奏</span></div>
+    </div>
+    <div style="margin-top:22px" class="row space"><span style="font-size:12px;color:#EBD9C0">默契成长</span><strong>12%</strong></div>
+    <div class="progress" style="margin-top:8px"><i style="width:12%"></i></div>
+    <div class="bottom-cta"><div class="button teal">看看它现在有多懂我 →</div></div>
+  </div>
+</section>
+
+<section class="screen" id="screen-06">
+  <div class="grain"></div><div class="content">
+    <div class="status"><span>9:41</span><span>● ● ▰</span></div>
+    <div class="row space"><div class="back">←</div><span class="eyebrow">初始阅读画像</span></div>
+    <h1>我大概认识你了。</h1><p>这不是等级标签，而是我接下来怎样陪你。</p>
+    <div class="portrait-card">
+      <span class="stamp">JUST RIGHT</span><h2>短篇原版 · 轻提示</h2>
+      <p>你能跟上清晰的情节；遇到少量陌生词时，一句解释就能继续。</p>
+      <div class="meter"><div class="meter-label"><span>现在的舒适区</span><span>稳定</span></div><div class="progress"><i style="width:72%"></i></div></div>
+      <div class="row gap8" style="margin-top:17px"><span class="pill on">科幻</span><span class="pill on" style="background:var(--teal);border-color:var(--teal)">体育逆转</span><span class="pill">游戏</span></div>
+    </div>
+    <div class="card service-list">
+      <div class="service"><span class="ico">Aa</span><div><h3>普通词不打扰</h3><p>只有关键陌生词出现轻提示</p></div></div>
+      <div class="service"><span class="ico" style="background:var(--coral)">≡</span><div><h3>长句一键拆开</h3><p>保留原文，不把内容变幼稚</p></div></div>
+      <div class="service"><span class="ico" style="background:var(--amber)">↗</span><div><h3>读完聊观点</h3><p>中文回答也可以，不做阅读理解题</p></div></div>
+    </div>
+    <div class="bottom-cta"><div class="button">很像我，去旅站看看 →</div><div style="text-align:center;margin-top:11px;font-size:12px;color:var(--muted)">有一点不对，修改画像</div></div>
+  </div>
+</section>
+
+<section class="screen station" id="screen-07">
+  <div class="grain"></div><div class="content">
+    <div class="station-top">
+      <div class="status"><span>9:41</span><span>● ● ▰</span></div>
+      <span class="eyebrow" style="color:#D9B98F">页间旅站 · DAY 3</span><h1>帕利已经开始<br>长成你的样子。</h1><p>1 条火星路线 · 3 个共同词语</p>
+      <div class="map-line"></div><div class="map-dot"></div><img class="station-pal" src="./英语阅读旅伴原型_files/pal.png">
+    </div>
+    <div class="today">
+      <div class="row space"><h3>今晚为你带来的路线</h3><span class="pill">换一条</span></div>
+      <div class="card" style="margin-top:12px;padding:12px"><div class="story-cover"></div><div class="row space"><div><span class="eyebrow">为你续上的故事</span><h3 style="margin-top:4px">火星城市之后，第 48 分钟</h3><p style="font-size:11px;margin-top:4px">约 5 分钟 · 会遇到 1 个旧词</p></div><div class="send">→</div></div></div>
+      <div class="row gap8" style="margin-top:12px"><span class="pill on">路线 03</span><span class="pill">物件 04</span><span class="pill">共同词 12</span></div>
+    </div>
+    <div class="nav"><div class="nav-item on"><b>⌂</b>旅站</div><div class="nav-item"><b>◫</b>发现</div><div class="nav-item"><b>◇</b>词句</div><div class="nav-item"><b>◎</b>我的</div></div>
+  </div>
+</section>
+
+<section class="screen weekly" id="screen-08">
+  <div class="grain"></div><div class="content">
+    <div class="week-hero">
+      <div class="status"><span>9:41</span><span>● ● ▰</span></div>
+      <span class="eyebrow" style="color:#E6F9F6">WEEK 01 · 同行日志</span><h1>你们都长大了一点。</h1><p>不是连续打卡，是共同留下的阅读痕迹。</p><img src="./英语阅读旅伴原型_files/pal.png">
+    </div>
+    <div class="week-columns">
+      <div class="week-col you"><h3>这周的你</h3><ul><li>读完 4 个故事</li><li>第一次读完 800+ 词文章</li><li>7 个词不再需要提示</li><li>从科幻走到真实航天</li></ul></div>
+      <div class="week-col it"><h3>这周的帕利</h3><ul><li>学会更早发现绕口长句</li><li>尾巴多出一段火星路线</li><li>收下 3 个共同词语</li><li>更懂你喜欢故事式解释</li></ul></div>
+    </div>
+    <div class="quote-card">“你把我养得更懂你了。下周，我们可以走远一点。”</div>
+    <div class="card" style="margin-top:13px"><div class="row space"><div><span class="eyebrow">下周预告</span><h3 style="margin-top:5px">火星上真的能打篮球吗？</h3><p style="font-size:11px;margin-top:3px">用你喜欢的题材，走向真实科学</p></div><span style="font-size:29px;color:var(--coral)">↗</span></div></div>
+    <div class="bottom-cta"><div class="button">分享我们的同行日志</div></div>
+  </div>
+</section>
+
+
+
+</body></html>

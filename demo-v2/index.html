@@ -1,0 +1,1617 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>英语阅读旅伴 · 静态流程 V2</title>
+  <style>
+    :root {
+      /* Primitive tokens */
+      --paper-50: #FFFDF8;
+      --paper-100: #FFF9EE;
+      --paper-200: #F4E7D1;
+      --paper-300: #E9D6B9;
+      --ink-900: #2B221C;
+      --brown-700: #684B35;
+      --brown-500: #8A664C;
+      --teal-500: #42AFA8;
+      --coral-500: #D8674C;
+      --amber-500: #E3A542;
+      --line-300: #D7C1A2;
+      --muted-600: #7F6D5C;
+      --white-50: #FFFCF6;
+      --green-600: #2E7D68;
+
+      /* Semantic tokens */
+      --surface-app: var(--paper-200);
+      --surface-card: var(--paper-100);
+      --surface-raised: var(--paper-50);
+      --text-primary: var(--ink-900);
+      --text-secondary: var(--brown-500);
+      --text-muted: var(--muted-600);
+      --brand-primary: var(--brown-700);
+      --brand-teal: var(--teal-500);
+      --brand-coral: var(--coral-500);
+      --brand-amber: var(--amber-500);
+      --border-subtle: var(--line-300);
+      --focus-ring: var(--teal-500);
+
+      /* Component tokens */
+      --font-sans: "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+      --font-serif: Georgia, "Times New Roman", serif;
+      --radius-card: 24px;
+      --radius-control: 16px;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --shadow-card: 0 8px 0 rgba(104, 75, 53, .08), 0 16px 34px rgba(59, 38, 24, .11);
+      --shadow-float: 0 16px 34px rgba(45, 28, 17, .24);
+      --duration-fast: 150ms;
+      --duration-normal: 240ms;
+    }
+
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 48px;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(66, 175, 168, .13), transparent 28%),
+        radial-gradient(circle at 88% 16%, rgba(216, 103, 76, .12), transparent 24%),
+        #242220;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      text-size-adjust: 100%;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; touch-action: manipulation; }
+    img { display: block; max-width: 100%; }
+    .icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+    .svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+    .board-copy {
+      width: min(1160px, 100%);
+      margin: 0 auto 36px;
+      color: var(--paper-100);
+    }
+    .board-copy h1 { margin: 0 0 8px; font-size: 34px; letter-spacing: -.8px; }
+    .board-copy p { margin: 0; color: #D7C1A2; font-size: 15px; line-height: 1.65; }
+
+    .board {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 60px 52px;
+    }
+    .frame { width: 390px; }
+    .frame-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      color: #F4E7D1;
+    }
+    .frame-label span {
+      display: inline-grid;
+      place-items: center;
+      min-width: 34px;
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: rgba(255, 249, 238, .14);
+      border: 1px solid rgba(255, 249, 238, .18);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .frame-label h2 { margin: 0; font-size: 14px; letter-spacing: .3px; }
+
+    .screen {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      overflow: hidden;
+      border-radius: 34px;
+      background: var(--surface-app);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, .34);
+      color: var(--text-primary);
+      isolation: isolate;
+    }
+    .screen.reader { background: #FAEEDA; }
+    .screen.dark { background: var(--brown-700); color: var(--white-50); }
+    .screen.map-screen { background: #EEDFC5; }
+    .screen.report-screen { background: var(--paper-100); }
+    .grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .11;
+      z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
+    }
+    .content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      padding: 26px 22px 24px;
+    }
+    .statusbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    .signal { letter-spacing: 2px; font-size: 10px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .eyebrow {
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1.35px;
+      text-transform: uppercase;
+    }
+    .page-title { margin: 14px 0 8px; font-size: 29px; line-height: 1.22; letter-spacing: -.55px; }
+    .page-title.compact { font-size: 26px; }
+    .lede { margin: 0; color: var(--text-muted); font-size: 14px; line-height: 1.58; }
+    .section-label { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+    .section-label h3 { margin: 0; font-size: 15px; }
+    .caption { color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+
+    .icon-button,
+    .back {
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 50%;
+      background: rgba(255, 252, 246, .6);
+      color: var(--brand-primary);
+    }
+    .icon-button:focus-visible,
+    .back:focus-visible,
+    .button:focus-visible,
+    .pill:focus-visible,
+    .nav-item:focus-visible,
+    .tool:focus-visible,
+    .story-node:focus-visible,
+    .continent:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--focus-ring) 52%, transparent);
+      outline-offset: 3px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      width: 100%;
+      min-height: 52px;
+      border: 0;
+      border-radius: var(--radius-control);
+      background: var(--brand-primary);
+      color: var(--white-50);
+      font-weight: 900;
+      box-shadow: 0 7px 0 #4B3324;
+      transition: transform var(--duration-fast), box-shadow var(--duration-fast), background var(--duration-fast);
+    }
+    .button.secondary {
+      background: var(--surface-card);
+      color: var(--brand-primary);
+      border: 1px solid var(--border-subtle);
+      box-shadow: none;
+    }
+    .button.teal { background: var(--brand-teal); box-shadow: 0 7px 0 #287D78; }
+    .button.coral { background: var(--brand-coral); box-shadow: 0 7px 0 #A94A35; }
+    .button:active { transform: translateY(3px); box-shadow: 0 4px 0 #4B3324; }
+    .button.secondary:active { transform: translateY(2px); box-shadow: none; }
+    .button-row { display: grid; gap: 10px; }
+    .bottom { position: absolute; left: 22px; right: 22px; bottom: 24px; }
+    .with-nav .bottom { bottom: 98px; }
+
+    .pill, .tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      border-radius: 999px;
+      padding: 7px 11px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 252, 246, .74);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .tag.teal { color: #175D58; background: #DDF5F1; border-color: #A7DDD7; }
+    .tag.coral { color: #9D3D28; background: #F8DED7; border-color: #E8B3A5; }
+    .tag.amber { color: #8A5B05; background: #F6E5C7; border-color: #E8C88E; }
+    .tag.dark { color: #FFF6E9; background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
+
+    .progress { height: 6px; overflow: hidden; border-radius: 999px; background: #DCC9AD; }
+    .progress > i { display: block; height: 100%; border-radius: inherit; background: var(--brand-teal); }
+    .progress.amber > i { background: var(--brand-amber); }
+    .progress.coral > i { background: var(--brand-coral); }
+    .progress.dark { background: rgba(255,255,255,.18); }
+    .progress.dark > i { background: var(--brand-amber); }
+
+    .portrait {
+      width: 100%;
+      height: 150px;
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 12px 14px rgba(55, 35, 20, .18));
+    }
+    .companion-card, .card, .report-card {
+      background: rgba(255, 249, 238, .9);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+    }
+    .companion-grid {
+      display: grid;
+      grid-template-columns: 1.14fr .93fr .93fr;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .companion-card {
+      position: relative;
+      min-width: 0;
+      height: 316px;
+      padding: 14px 9px;
+      overflow: hidden;
+    }
+    .companion-card.selected {
+      border: 2px solid var(--brand-primary);
+      background: #FFF3DA;
+      box-shadow: 0 9px 0 rgba(104, 75, 53, .16);
+    }
+    .companion-card img { width: 100%; height: 142px; object-fit: contain; }
+    .companion-card.selected img { height: 154px; }
+    .companion-card h3 { margin: 8px 0 3px; font-size: 14px; line-height: 1.2; }
+    .companion-card .type { color: var(--brand-teal); font-size: 10px; font-weight: 900; }
+    .companion-card p { margin: 7px 0 0; color: var(--text-muted); font-size: 11px; line-height: 1.45; }
+    .selection-check {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--brand-primary);
+      color: var(--white-50);
+    }
+    .selection-check .icon { width: 14px; height: 14px; }
+
+    .ai-thread { display: grid; gap: 11px; margin-top: 22px; }
+    .bubble {
+      max-width: 88%;
+      padding: 13px 15px;
+      border-radius: 18px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-card);
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.52;
+    }
+    .bubble.ai { border-bottom-left-radius: 5px; }
+    .bubble.me {
+      justify-self: end;
+      border-color: var(--brand-primary);
+      border-bottom-right-radius: 5px;
+      background: var(--brand-primary);
+      color: var(--white-50);
+    }
+    .bubble small { display: block; margin-top: 5px; color: var(--text-muted); font-size: 10px; font-weight: 800; }
+    .bubble.me small { color: #E6D3BE; }
+    .composer {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 56px;
+      padding: 7px 8px 7px 16px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 19px;
+      background: var(--surface-card);
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .composer .send {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      margin-left: auto;
+      border: 0;
+      border-radius: 50%;
+      background: var(--brand-coral);
+      color: white;
+      flex: none;
+    }
+    .typing { display: inline-flex; gap: 4px; align-items: center; min-height: 18px; }
+    .typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--brown-500); opacity: .55; }
+    .tiny-note { display: flex; align-items: center; gap: 7px; margin-top: 10px; color: var(--text-muted); font-size: 11px; font-weight: 800; }
+
+    .signal-chain {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 98px;
+      display: grid;
+      gap: 8px;
+      padding: 13px;
+      border-radius: 18px;
+      border: 1px solid #C8E3DF;
+      background: #E9F6F3;
+      color: #175D58;
+    }
+    .signal-chain h3 { margin: 0 0 2px; font-size: 13px; }
+    .signal-row { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; font-weight: 800; line-height: 1.45; }
+    .signal-row .icon { width: 14px; height: 14px; margin-top: 2px; }
+    .signal-row b { color: #175D58; }
+    .signal-row span { color: #4B716B; }
+
+    .recommend-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 0;
+      margin-top: 20px;
+      padding: 12px;
+    }
+    .story-cover {
+      position: relative;
+      height: 128px;
+      overflow: hidden;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #CC5E48 0%, #E3A542 100%);
+    }
+    .story-cover::before {
+      content: attr(data-code);
+      position: absolute;
+      right: 28px;
+      top: 42px;
+      color: #5C3D2C;
+      font: 700 72px/1 var(--font-serif);
+    }
+    .story-cover::after {
+      content: "";
+      position: absolute;
+      left: 30px;
+      top: 34px;
+      width: 102px;
+      height: 102px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255, 249, 238, .8);
+      transform: rotate(16deg);
+    }
+    .recommend-card h2 { margin: 12px 0 6px; font-size: 20px; line-height: 1.24; }
+    .recommend-card p { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.48; }
+    .story-route-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .story-route-line .tag { min-height: 26px; padding: 4px 8px; font-size: 10px; }
+    .story-route-line .sep { width: 12px; height: 1px; flex: none; background: var(--border-subtle); }
+    .story-route-line span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .story-synopsis { margin-top: 7px !important; }
+    .unlock-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 14px;
+      background: #F8E7CE;
+      color: #7A4E0B;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+    .unlock-line .icon { width: 15px; height: 15px; margin-top: 1px; }
+    .reason-box {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      padding: 10px;
+      border-radius: 16px;
+      background: #E6F5F2;
+      color: #175D58;
+      font-size: 11px;
+      line-height: 1.5;
+      font-weight: 800;
+    }
+
+    .reader-head { display: flex; align-items: center; gap: 12px; }
+    .reader-head .progress { flex: 1; }
+    .reader-title { margin: 20px 0 7px; font: 700 25px/1.17 var(--font-serif); }
+    .reader-meta { padding-bottom: 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 11px; font-weight: 900; letter-spacing: .5px; }
+    .article { margin-top: 17px; color: #332820; font: 17px/1.68 var(--font-serif); }
+    .article p { margin: 0 0 14px; }
+    .word-mark {
+      padding: 0 2px 2px;
+      border-bottom: 3px solid rgba(66, 175, 168, .55);
+      background: linear-gradient(transparent 58%, rgba(66, 175, 168, .28) 58%);
+      font-weight: 700;
+    }
+    .ai-note {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 88px;
+      display: flex;
+      gap: 11px;
+      padding: 14px;
+      border-radius: 18px;
+      background: var(--brand-primary);
+      color: var(--white-50);
+      box-shadow: var(--shadow-float);
+    }
+    .ai-note strong { display: block; margin-bottom: 3px; font-size: 13px; }
+    .ai-note p { margin: 0; color: #F8E9D6; font-size: 12px; line-height: 1.5; }
+    .toolbar {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      min-height: 52px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      background: var(--surface-card);
+    }
+    .tool {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      color: var(--brand-primary);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .tool .icon { width: 17px; height: 17px; }
+
+    .dark .topbar .back { border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: white; }
+    .dark .caption, .dark .lede { color: #E9D8C1; }
+    .stamp {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: var(--brand-coral);
+      color: white;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      transform: rotate(-2deg);
+    }
+    .growth-card {
+      position: relative;
+      min-height: 322px;
+      margin-top: 24px;
+      padding: 18px;
+      overflow: hidden;
+      border-radius: 28px;
+      background: var(--surface-card);
+      color: var(--text-primary);
+    }
+    .growth-card img { position: absolute; right: -18px; bottom: -28px; width: 210px; height: 236px; object-fit: contain; }
+    .growth-card h2 { margin: 12px 0 10px; font-size: 26px; line-height: 1.16; }
+    .growth-card p { max-width: 210px; margin: 0; color: var(--text-muted); font-size: 13px; line-height: 1.55; }
+    .remember-box { position: absolute; left: 18px; right: 18px; bottom: 18px; padding: 13px; border-radius: 17px; background: #E6F5F2; color: #175D58; font-size: 12px; font-weight: 800; line-height: 1.45; }
+
+    .profile-hero {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 28px;
+      background: var(--brand-primary);
+      color: white;
+      box-shadow: var(--shadow-card);
+    }
+    .profile-hero h2 { margin: 12px 0 8px; font-size: 24px; line-height: 1.22; }
+    .profile-hero p { margin: 0; color: #E9D8C1; font-size: 13px; line-height: 1.55; }
+    .profile-list { display: grid; gap: 10px; margin-top: 14px; }
+    .profile-item { display: grid; grid-template-columns: 42px 1fr auto; gap: 11px; align-items: center; padding: 12px; border: 1px solid var(--border-subtle); border-radius: 18px; background: var(--surface-card); }
+    .profile-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 14px; background: var(--brand-teal); color: white; }
+    .profile-icon.coral { background: var(--brand-coral); }
+    .profile-icon.amber { background: var(--brand-amber); color: var(--ink-900); }
+    .profile-item h3 { margin: 0 0 3px; font-size: 14px; }
+    .profile-item p { margin: 0; color: var(--text-muted); font-size: 11px; line-height: 1.45; }
+    .profile-item .pill { min-height: 28px; padding: 5px 9px; }
+    .profile-edit-sheet {
+      position: absolute;
+      z-index: 8;
+      left: 16px;
+      right: 16px;
+      bottom: 92px;
+      display: none;
+      padding: 16px;
+      border-radius: 20px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-float);
+    }
+    .profile-edit-sheet.show { display: block; animation: screen-in .2s ease-out both; }
+    .profile-edit-sheet h3 { margin: 0 0 6px; font-size: 15px; }
+    .profile-edit-sheet p { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+    .profile-edit-sheet .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .profile-edit-sheet .pill { min-height: 36px; }
+
+    .map-copy { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .map-copy p { margin: 8px 0 0; color: #6B5543; font-size: 13px; line-height: 1.5; }
+    .map-canvas {
+      position: relative;
+      height: 390px;
+      margin: 20px -8px 0;
+      overflow: hidden;
+      border-radius: 30px;
+      background: linear-gradient(155deg, #C5DDD8 0%, #DCEBE6 58%, #F0E5CB 100%);
+      border: 1px solid rgba(104, 75, 53, .22);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.4), inset 0 0 34px rgba(255,255,255,.3);
+    }
+    .map-canvas::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .24;
+      background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.38) 0 2px, transparent 2px 11px);
+      mix-blend-mode: soft-light;
+    }
+    .map-canvas svg { position: relative; display: block; width: 100%; height: 100%; }
+    .map-island-shadow { fill: rgba(93, 65, 38, .14); }
+    .map-island-land { fill: #F2D9A9; stroke: #8A664C; stroke-width: 1.6; } 
+    .map-island-top { fill: #D3EAC7; stroke: #8A664C; stroke-width: 1.1; }
+    .map-island-water { fill: #F8EBD3; stroke: #8A664C; stroke-width: 1.2; }
+    .map-island-label { fill: #5B4331; font-family: inherit; font-size: 12px; font-weight: 900; letter-spacing: .2px; }
+    .map-island-count { fill: #7F6D5C; font-family: inherit; font-size: 9px; font-weight: 800; }
+    .map-route { fill: none; stroke: rgba(104, 75, 53, .42); stroke-width: 2.6; stroke-dasharray: 4 7; stroke-linecap: round; }
+    .map-route.recommend { stroke: #D8674C; stroke-width: 3.4; stroke-dasharray: 9 8; }
+    .map-route.outline { stroke: rgba(255, 249, 238, .9); stroke-width: 6.5; stroke-linecap: round; stroke-dasharray: 4 7; }
+    .map-current-badge { fill: #D8674C; }
+    .map-current-text { fill: #FFF6E9; font-family: inherit; font-size: 10px; font-weight: 900; }
+    .map-next-label { fill: #9D3D28; font-family: inherit; font-size: 10px; font-weight: 900; }
+    .map-castle { fill: #FBEBD2; stroke: #8A664C; stroke-width: 1.4; stroke-linejoin: round; }
+    .map-flag { fill: #E3A542; stroke: #8A664C; stroke-width: 1.2; stroke-linejoin: round; }
+    .map-legend {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 4;
+      display: grid;
+      gap: 5px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(255, 249, 238, .88);
+      border: 1px solid rgba(104, 75, 53, .2);
+      font-size: 9px;
+      font-weight: 900;
+      color: #6B5543;
+    }
+    .map-legend div { display: flex; align-items: center; gap: 6px; }
+    .map-legend i { display: block; width: 16px; height: 2px; }
+    .map-legend i.coral { background: var(--brand-coral); border-radius: 999px; height: 3px; }
+    }
+    .map-line { position: absolute; inset: 0; width: 100%; height: 100%; color: rgba(104,75,53,.35); }
+    .continent {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+      border: 2px solid rgba(104,75,53,.48);
+      background: rgba(255,249,238,.96);
+      color: var(--brand-primary);
+      text-align: center;
+      box-shadow: 0 8px 0 rgba(104,75,53,.12);
+      z-index: 2;
+    }
+    .continent strong { display: block; font-size: 13px; line-height: 1.2; }
+    .continent small { display: block; margin-top: 3px; color: var(--text-muted); font-size: 10px; font-weight: 900; }
+    .continent.recommended { border-color: var(--brand-coral); background: #FFEFE7; box-shadow: 0 0 0 5px rgba(216,103,76,.13), 0 9px 0 rgba(104,75,53,.13); }
+    .continent .rec { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); padding: 3px 8px; border-radius: 999px; background: var(--brand-coral); color: #fff; font-size: 9px; font-weight: 900; white-space: nowrap; }
+    .c-world { left: 24px; top: 44px; width: 116px; height: 104px; border-radius: 58% 42% 55% 45% / 45% 56% 44% 55%; }
+    .c-science { left: 155px; top: 26px; width: 150px; height: 122px; border-radius: 44% 56% 42% 58% / 58% 44% 56% 42%; }
+    .c-culture { right: 18px; top: 166px; width: 120px; height: 112px; border-radius: 61% 39% 53% 47% / 48% 58% 42% 52%; }
+    .c-business { left: 48px; top: 182px; width: 134px; height: 112px; border-radius: 42% 58% 52% 48% / 56% 44% 56% 44%; }
+    .c-growth { right: 38px; bottom: 36px; width: 142px; height: 114px; border-radius: 49% 51% 39% 61% / 56% 43% 57% 44%; }
+    .c-stories { left: 22px; bottom: 34px; width: 152px; height: 108px; border-radius: 55% 45% 58% 42% / 48% 56% 44% 52%; }
+    .map-pin { position: absolute; width: 13px; height: 13px; border-radius: 50%; background: var(--brand-coral); border: 3px solid white; box-shadow: 0 0 0 4px rgba(216,103,76,.2); z-index: 3; }
+    .pin-1 { left: 121px; top: 158px; }
+    .pin-2 { left: 178px; top: 245px; }
+    .pin-3 { left: 280px; top: 287px; }
+
+    .continent-hero {
+      margin: -26px -22px 0;
+      padding: 28px 22px 22px;
+      min-height: 300px;
+      border-radius: 0 0 38px 38px;
+      background: linear-gradient(150deg, #3C2B22 0%, #73513A 100%);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .continent-hero h1 { margin: 18px 0 8px; font-size: 30px; line-height: 1.17; }
+    .continent-hero p { margin: 0; color: #E9D8C1; font-size: 13px; line-height: 1.55; }
+    .continent-orbit { position: absolute; right: -60px; bottom: -54px; width: 210px; height: 210px; border: 2px dashed rgba(255,255,255,.3); border-radius: 50%; }
+    .route-path { position: relative; margin-top: 22px; padding-left: 26px; }
+    .route-path::before { content: ""; position: absolute; left: 9px; top: 14px; bottom: 14px; width: 2px; border-left: 2px dashed var(--border-subtle); }
+    .story-node { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; margin-bottom: 12px; padding: 14px; border: 1px solid var(--border-subtle); border-radius: 19px; background: var(--surface-card); box-shadow: var(--shadow-card); }
+    .story-node::before { content: ""; position: absolute; left: -24px; top: 26px; width: 14px; height: 14px; border-radius: 50%; background: var(--brand-teal); border: 3px solid var(--surface-app); }
+    .story-node.done::before { background: var(--brand-amber); }
+    .story-node.next::before { background: var(--brand-coral); }
+    .story-node h3 { margin: 0 0 4px; font-size: 14px; }
+    .story-node p { margin: 0; color: var(--text-muted); font-size: 11px; line-height: 1.45; }
+    .story-node .status { color: var(--brand-coral); font-size: 11px; font-weight: 900; white-space: nowrap; }
+
+    .split-panel {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 88px;
+      padding: 16px;
+      border-radius: 20px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-float);
+    }
+    .split-panel h3 { margin: 0 0 8px; color: var(--brand-primary); font-size: 15px; }
+    .split-panel p { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.55; }
+    .split-panel p + p { margin-top: 7px; }
+
+    .report-hero { padding: 18px; border-radius: 26px; background: var(--brand-teal); color: white; box-shadow: var(--shadow-card); }
+    .report-hero h2 { margin: 10px 0 7px; font-size: 26px; line-height: 1.16; }
+    .report-hero p { margin: 0; color: #DDF5F1; font-size: 13px; line-height: 1.5; }
+    .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .report-card { padding: 12px; }
+    .report-card header { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+    .report-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 12px; background: #E5F5F2; color: #175D58; }
+    .report-icon.coral { background: #F8DED7; color: #9D3D28; }
+    .report-icon.amber { background: #F6E5C7; color: #8A5B05; }
+    .report-card h3 { margin: 0; font-size: 14px; }
+    .report-card p { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+    .unlock-strip {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 10px;
+      padding: 12px 13px;
+      border-radius: 16px;
+      background: #F8E7CE;
+      color: #7A4E0B;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+    .unlock-strip .icon { width: 16px; height: 16px; flex: none; }
+    .word-pair { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .word-pair strong { font: 700 18px/1.2 var(--font-serif); }
+    .word-pair span { color: var(--brand-coral); font-size: 12px; font-weight: 900; }
+    .quote-line { margin-top: 6px; color: var(--brand-primary); font: 15px/1.5 var(--font-serif); }
+
+    .nav {
+      position: absolute;
+      z-index: 5;
+      left: 18px;
+      right: 18px;
+      bottom: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      min-height: 66px;
+      padding: 7px 8px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 23px;
+      background: rgba(255, 249, 238, .96);
+      box-shadow: 0 12px 28px rgba(77, 50, 33, .16);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      min-width: 0;
+      min-height: 52px;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .nav-item .icon { width: 20px; height: 20px; }
+    .nav-item.on { color: var(--brand-primary); background: #F8E7CE; }
+
+    /* Dynamic demo overrides */
+    body { display: grid; place-items: center; min-height: 100vh; padding: 24px; overflow: auto; }
+    .board-copy { display: none; }
+    .board { display: block; width: 390px; margin: 0; }
+    .frame { display: none; width: 390px; }
+    .frame.active { display: block; animation: frame-in .26s cubic-bezier(.2,.7,.2,1) both; }
+    .frame-label { display: none; }
+    @keyframes frame-in { from { opacity: .78; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+    .screen { box-shadow: 0 32px 80px rgba(0,0,0,.38); }
+    button { cursor: pointer; }
+    .composer input {
+      min-width: 0;
+      flex: 1;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+    .composer input::placeholder { color: var(--text-muted); }
+    .reading-complete {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin: 12px 0 6px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      background: rgba(255, 249, 238, .9);
+      color: var(--brand-primary);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .reader.dim { background: #E7D8C3; }
+    .reader.large .article,
+    .reader.large .article p { font-size: 20px; line-height: 1.62; }
+    .signal-chain { display: none; }
+    .signal-chain.show { display: grid; animation: screen-in .2s ease-out both; }
+    .split-panel { padding: 10px 12px; }
+    .split-panel h3 { font-size: 12px; margin-bottom: 4px; }
+    .split-panel p { font-size: 10px; line-height: 1.32; }
+    .split-panel { display: none; }
+    .split-panel.show { display: block; animation: screen-in .2s ease-out both; }
+    .map-island { cursor: pointer; }
+    .map-island:focus-visible,
+    .map-island:focus {
+      outline: none;
+    }
+    .map-island:focus-visible .map-island-land,
+    .map-island:hover .map-island-land { stroke: var(--brand-coral); stroke-width: 2.4; }
+    .toast {
+      position: fixed;
+      z-index: 999;
+      left: 50%;
+      bottom: 34px;
+      transform: translate(-50%, 24px);
+      max-width: 340px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(43, 34, 28, .96);
+      color: #FFF9EE;
+      font-size: 12px;
+      font-weight: 800;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--duration-normal), transform var(--duration-normal);
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    @media (max-width: 430px) {
+      body { padding: 8px; }
+      .board { width: min(390px, calc(100vw - 16px)); }
+      .frame { width: 100%; }
+      .screen { margin: 0 auto; width: 100%; max-width: 390px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 1ms !important; animation-duration: 1ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></symbol>
+    <symbol id="i-type" viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></symbol>
+    <symbol id="i-split" viewBox="0 0 24 24"><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 3v12M18 9a9 9 0 0 1-9 9"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3-1.9 5.1L5 10l5.1 1.9L12 17l1.9-5.1L19 10l-5.1-1.9z"/><path d="M5 3v4M3 5h4M19 17v4M17 19h4"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M10 2v7L4.5 19a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 9V2M8.5 2h7"/><path d="M7 15h10"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/></symbol>
+    <symbol id="i-growth" viewBox="0 0 24 24"><path d="M3 20h18M6 16l4-5 3 3 5-8"/><path d="M14 6h4v4"/></symbol>
+    <symbol id="i-theatre" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h.01M16 9h.01M8 15c1.2 1.3 2.5 2 4 2s2.8-.7 4-2"/></symbol>
+    <symbol id="i-quote" viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5H4v7h3c0 4-1 6-4 7zM14 21c3 0 7-1 7-8V5h-6v7h3c0 4-1 6-4 7z"/></symbol>
+    <symbol id="i-book-open" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  </svg>
+
+  <header class="board-copy">
+    <h1>英语阅读旅伴 · 静态流程 V2</h1>
+    <p>用于确认 AI 原生兴趣采集、推荐旅程、主题大陆、AI 陪读和成长报告。此文件只用于静态评审，动态交互将在确认后实现。</p>
+  </header>
+
+  <main class="board">
+    <article class="frame active" id="stage-01" data-stage="1">
+      <header class="frame-label"><span>01</span><h2>选择旅伴</h2></header>
+      <section class="screen">
+        <div class="grain"></div>
+        <div class="content">
+          <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
+          <div class="topbar"><span class="eyebrow">阅读世界 · 初次见面</span><button class="pill" id="skip-onboarding" type="button">跳过</button></div>
+          <h1 class="page-title">读英文时，<br>你想让谁坐在旁边？</h1>
+          <p class="lede">不是选老师，是选一种陪你读完的方式。</p>
+          <div class="companion-grid">
+            <article class="companion-card selected" data-companion="pal" data-name="帕利" role="button" tabindex="0" aria-pressed="true">
+              <span class="selection-check"><svg class="icon"><use href="#i-check"/></svg></span>
+              <img src="./assets/pal.png" alt="帕利旅伴形象" data-companion-avatar>
+              <h3>帕利 Pal</h3>
+              <div class="type">机灵型旅伴</div>
+              <p>“我会吐槽难句，不吐槽你。”</p>
+            </article>
+            <article class="companion-card" data-companion="wick" data-name="灯芯" role="button" tabindex="0" aria-pressed="false">
+              <img src="./assets/wick.png" alt="灯芯旅伴形象">
+              <h3>灯芯 Wick</h3>
+              <div class="type">安静型旅伴</div>
+              <p>“你读你的，我替你留灯。”</p>
+            </article>
+            <article class="companion-card" data-companion="nubo" data-name="努波" role="button" tabindex="0" aria-pressed="false">
+              <img src="./assets/nubo.png" alt="努波旅伴形象">
+              <h3>努波 Nubo</h3>
+              <div class="type">活力型旅伴</div>
+              <p>“看正文时，我会安静下来。”</p>
+            </article>
+          </div>
+          <div class="bottom button-row">
+            <button class="button" id="companion-cta" type="button">让帕利陪我出发 <svg class="icon"><use href="#i-arrow-right"/></svg></button>
+            <button class="button secondary" id="random-companion" type="button">帮我随机选一个</button>
+          </div>
+        </div>
+      </section>
+    </article>
+
+    <article class="frame" id="stage-02" data-stage="2">
+      <header class="frame-label"><span>02</span><h2>AI 首登对话</h2></header>
+      <section class="screen">
+        <div class="grain"></div>
+        <div class="content">
+          <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
+          <div class="topbar"><span class="eyebrow">初次见面 · 2 句话就够</span><button class="pill" id="skip-chat" type="button">跳过</button></div>
+          <h1 class="page-title compact">先别选标签，<br>聊聊你最近在看什么。</h1>
+          <p class="lede">帕利会从你的表达里理解兴趣，而不是让你填表。</p>
+          <div class="ai-thread">
+            <div class="bubble ai">如果只能留一个你最近会反复看的内容，你会选什么？</div>
+            <div class="bubble me">赛博朋克，还有 AI 公司新闻。最近也在看真实航天。</div>
+            <div class="bubble ai">我听到一种偏好：未来世界，但它最好贴着现实发生。今晚你想更轻松，还是接受一点挑战？</div>
+            <div class="bubble ai">
+              <span class="typing"><i></i><i></i><i></i></span>
+              <small>帕利正在整理你的兴趣坐标</small>
+            </div>
+          </div>
+          <div class="signal-chain">
+            <h3>帕利收到的线索</h3>
+            <div class="signal-row"><svg class="icon"><use href="#i-sparkles"/></svg><span><b>你提到：</b>赛博朋克 · AI 公司 · 真实航天</span></div>
+            <div class="signal-row"><svg class="icon"><use href="#i-message"/></svg><span><b>帕利听到：</b>未来世界 · 真实技术 · 现实边缘</span></div>
+            <div class="signal-row"><svg class="icon"><use href="#i-map"/></svg><span><b>接下来：</b>它先从这些信号里找一条路线给你</span></div>
+          </div>
+          <div class="composer"><input id="chat-input" type="text" placeholder="我会到现实边缘看看" aria-label="告诉帕利你在看什么"><button class="send" id="chat-send" type="button" aria-label="发送"><svg class="icon"><use href="#i-arrow-right"/></svg></button></div>
+        </div>
+      </section>
+    </article>
+
+    <article class="frame" id="stage-03" data-stage="3">
+      <header class="frame-label"><span>03</span><h2>AI 推荐</h2></header>
+      <section class="screen">
+        <div class="grain"></div>
+        <div class="content">
+          <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
+          <div class="topbar"><span class="eyebrow">已理解你的兴趣 · 推荐 1/1</span><button class="pill" id="recommend-more" type="button">换一条</button></div>
+          <h1 class="page-title compact">我先带你去<br>现实边缘的未来。</h1>
+          <p class="lede">这篇符合你刚才提到的三个线索：未来城市、真实科技和短的挑战。</p>
+          <article class="card recommend-card">
+            <div class="story-cover" id="story-cover" data-code="47"></div>
+            <div class="story-route-line" id="rec-route-line"><span class="tag teal">科学大陆</span><span class="sep"></span><span class="tag">火星系列 · 当城市失效</span><span class="sep"></span><span class="tag coral">第 1 / 4 段</span></div>
+            <h2 id="rec-title">火星城市停电的第 47 分钟</h2>
+            <p class="story-synopsis" id="rec-synopsis">一座城市突然停电，旧维修机器人带着玛拉穿过一个不再依赖中心网络的隧道。这不是火星冒险，而是城市系统失效后，人如何重新连接的故事。</p>
+            <div class="unlock-line" id="rec-unlock"><svg class="icon"><use href="#i-map"/></svg><span>读完本段：解锁“第 48 分钟”，点亮科学大陆第 1 段海岸线</span></div>
+            <div class="reason-box">
+              <svg class="icon"><use href="#i-sparkles"/></svg>
+              <span>推荐原因：你提到未来城市和真实航天，这篇落在“未来世界里的真实系统”，只需 4 分钟，只会在关键处打扰你。</span>
+            </div>
+          </article>
+          <div class="bottom button-row">
+            <button class="button" id="recommend-cta" type="button">开始这篇故事 <svg class="icon"><use href="#i-arrow-right"/></svg></button>
+            <button class="button secondary" id="recommend-swap" type="button">我想换一个感觉</button>
+          </div>
+        </div>
+      </section>
+    </article>
+
+    <article class="frame" id="stage-04" data-stage="4">
+      <header class="frame-label"><span>04</span><h2>首次阅读</h2></header>
+      <section class="screen reader">
+        <div class="grain"></div>
+        <div class="content">
+          <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
+          <div class="reader-head"><button class="back" id="reader-close-1" type="button" aria-label="关闭阅读"><svg class="icon"><use href="#i-arrow-left"/></svg></button><div class="progress"><i style="width:36%"></i></div><strong style="font-size:12px">2:18</strong></div>
+          <div class="topbar"><span class="eyebrow">阅读世界 · 科学大陆 · 1/4</span><span class="pill">轻提示</span></div>
+          <h1 class="reader-title">The 47th Minute<br>Without Power</h1>
+          <div class="reader-meta">MARS CITY · A 4-MINUTE STORY</div>
+          <div class="article">
+            <p>At 21:47, every light in the city went out. The glass towers disappeared into the red dust.</p>
+            <p>Mara waited for the emergency system to start. Nothing happened. Then an old repair robot <span class="word-mark" id="word-mark-1" role="button" tabindex="0">emerged</span> from a tunnel under the street.</p>
+            <p>“I know another way,” it said. The route was longer, but it did not depend on the city’s network.</p>
+          </div>
+          <button class="reading-complete" id="complete-reading-1" type="button">完成本次阅读 <svg class="icon"><use href="#i-arrow-right"/></svg></button>
+          <div class="ai-note" id="ai-note-1">
+            <img src="./assets/pal.png" alt="" width="48" height="56" style="object-fit:contain" data-companion-avatar>
+            <div><strong>帕利在关键处给了你一条线索</strong><p>emerged 不只是 came out。它更像“从看不见的地方慢慢出现”。</p></div>
+          </div>
+          <div class="toolbar">
+            <button class="tool" id="brightness-1" type="button"><svg class="icon"><use href="#i-sun"/></svg>亮度</button>
+            <button class="tool" id="font-1" type="button"><svg class="icon"><use href="#i-type"/></svg>字号</button>
+            <button class="tool" id="sentence-1" type="button"><svg class="icon"><use href="#i-split"/></svg>拆句</button>
+            <button class="tool" id="ask-1" type="button"><svg class="icon"><use href="#i-message"/></svg>问帕利</button>
+          </div>
+        </div>
+      </section>
+    </article>
+
+    <article class="frame" id="stage-05" data-stage="5">
+      <header class="frame-label"><span>05</span><h2>首次成长反馈</h2></header>
+      <section class="screen dark">
+        <div class="grain"></div>
+        <div class="content">
+          <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
+          <span class="stamp">FIRST ROUTE</span>
+          <h1 class="page-title">你读完了。<br>帕利也留下了第一段路线。</h1>
+          <p class="lede">这不是奖励，而是你们下一次会怎么继续。</p>
+          <div class="growth-card">
+            <span class="eyebrow">本次留下</span>
+            <h2>“现实边缘的未来故事”</h2>
+            <p>帕利把你刚才的表达和这篇阅读连在了一起。</p>
+            <img src="./assets/pal.png" alt="帕利成长状态" data-companion-avatar>
+            <div class="remember-box">它记住了：你喜欢未来设定，但希望故事落在真实问题上。下一次，它会优先推荐“科学”和“世界热点”。<br><br>已点亮：科学大陆第 1 段海岸线。</div>
+          </div>
+          <div class="bottom button-row"><button class="button teal" id="feedback-next" type="button">看看它怎样理解你 <svg class="icon"><use href="#i-arrow-right"/></svg></button></div>
+        </div>
+      </section>
+    </article>
+
+    <article class="frame" id="stage-06" data-stage="6">
+      <header class="frame-label"><span>06</span><h2>阅读画像</h2></header>
+      <section class="screen with-nav">
+        <div class="grain"></div>
+        <div class="content">
+          <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
+          <div class="topbar"><button class="back" id="profile-back" type="button" aria-label="返回"><svg class="icon"><use href="#i-arrow-left"/></svg></button><span class="eyebrow">初步阅读画像</span></div>
+          <h1 class="page-title compact">这不是等级，<br>是今晚怎么陪你。</h1>
+          <section class="profile-hero">
+            <span class="stamp">JUST RIGHT</span>
+            <h2>短篇原版 · 先给线索</h2>
+            <p>你能跟上清晰的情节；遇到少量陌生词时，先给语境提示，再补完整解释。</p>
+          </section>
+          <div class="profile-list">
+            <article class="profile-item"><span class="profile-icon"><svg class="icon"><use href="#i-sparkles"/></svg></span><div><h3>兴趣坐标</h3><p>未来科技 · 真实世界 · 短篇故事</p></div><span class="pill">继续观察</span></article>
+            <article class="profile-item"><span class="profile-icon coral"><svg class="icon"><use href="#i-book-open"/></svg></span><div><h3>阅读节奏</h3><p>一次 3-5 分钟，完整读完优先</p></div><span class="pill">5 分钟</span></article>
+            <article class="profile-item"><span class="profile-icon amber"><svg class="icon"><use href="#i-message"/></svg></span><div><h3>提示方式</h3><p>少打扰，只解释影响理解的地方</p></div><span class="pill">轻提示</span></article>
+          </div>
+          <div class="profile-edit-sheet" id="profile-edit-sheet">
+            <h3>调整“这次怎么陪你”</h3>
+            <p>改完以后，推荐、提示密度和阅读长度都会跟着变。</p>
+            <div class="row">
+              <button class="pill on" type="button" data-profile-option>轻提示</button>
+              <button class="pill" type="button" data-profile-option>多解释</button>
+              <button class="pill on" type="button" data-profile-option>5 分钟</button>
+              <button class="pill" type="button" data-profile-option>10 分钟</button>
+            </div>
+          </div>
+          <div class="bottom button-row"><button class="button" id="profile-confirm" type="button">去阅读世界看为你排序的大陆 <svg class="icon"><use href="#i-map"/></svg></button><button class="button secondary" id="edit-profile" type="button">有一点不对，调整画像</button></div>
+          <nav class="nav" aria-label="主导航">
+            <button class="nav-item" type="button" data-go="stage-07"><svg class="icon"><use href="#i-home"/></svg>世界</button>
+            <button class="nav-item" type="button" data-go="stage-03"><svg class="icon"><use href="#i-compass"/></svg>发现</button>
+            <button class="nav-item" type="button" data-go="stage-04"><svg class="icon"><use href="#i-book"/></svg>词句</button>
+            <button class="nav-item on" type="button" data-go="stage-06"><svg class="icon"><use href="#i-user"/></svg>我的</button>
+          </nav>
+        </div>
+      </section>
+    </article>
+
+    <article class="frame" id="stage-07" data-stage="7">
+      <header class="frame-label"><span>07</span><h2>主题大陆总览</h2></header>
+      <section class="screen map-screen with-nav">
+        <div class="grain"></div>
+        <div class="content">
+          <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
+          <div class="map-copy"><div><span class="eyebrow">阅读世界 · DAY 1</span><h1 class="page-title compact">你的地图，<br>会随阅读改变。</h1><p>科学大陆被排在前面，因为你刚才留下了“未来科技 + 现实问题”的兴趣坐标。</p></div><button class="icon-button" id="view-map" type="button" aria-label="查看整体地图"><svg class="icon"><use href="#i-map"/></svg></button></div>
+          <div class="map-canvas">
+            <svg viewBox="0 0 360 390" role="img" aria-label="阅读世界岛屿闯关地图">
+              <g fill="none" stroke="rgba(255,255,255,.42)" stroke-width="1.5">
+                <ellipse cx="112" cy="152" rx="54" ry="34"/>
+                <ellipse cx="252" cy="108" rx="58" ry="36"/>
+                <ellipse cx="322" cy="240" rx="50" ry="32"/>
+                <ellipse cx="242" cy="300" rx="54" ry="34"/>
+                <ellipse cx="100" cy="316" rx="52" ry="33"/>
+                <ellipse cx="180" cy="362" rx="56" ry="34"/>
+                <ellipse cx="308" cy="346" rx="38" ry="26"/>
+              </g>
+
+              <g>
+                <path class="map-route outline" d="M112 152 C152 104 216 100 252 108 M260 124 C296 180 316 220 322 240 M296 250 C276 288 254 300 242 300 M216 316 C170 336 126 332 104 316 M104 316 C118 348 152 372 180 362 M200 368 C244 376 282 360 308 346"/>
+                <path class="map-route" d="M112 152 C152 104 216 100 252 108 M260 124 C296 180 316 220 322 240 M296 250 C276 288 254 300 242 300 M216 316 C170 336 126 332 104 316 M104 316 C118 348 152 372 180 362 M200 368 C244 376 282 360 308 346"/>
+              </g>
+              <g>
+                <path class="map-route outline" d="M220 118 C186 98 142 108 124 132"/>
+                <path class="map-route recommend" d="M220 118 C186 98 142 108 124 132"/>
+              </g>
+
+              <g transform="translate(178 108)">
+                <path d="M0 0h14l-3 4H3Z" fill="#F8EBD3" stroke="#8A664C" stroke-width="1.2"/>
+                <path d="M6 0V-10L-2 1" fill="none" stroke="#8A664C" stroke-width="1.3"/>
+              </g>
+
+              <g class="map-island" data-theme="world" data-name="世界热点" role="button" tabindex="0" aria-label="进入世界热点">
+                <ellipse class="map-island-shadow" cx="112" cy="156" rx="42" ry="24"/>
+                <ellipse class="map-island-land" cx="112" cy="154" rx="42" ry="24"/>
+                <ellipse class="map-island-top" cx="112" cy="149" rx="36" ry="19"/>
+                <path d="M106 142v-8M100 136l6-9 6 9" fill="none" stroke="#8A664C" stroke-width="1.4" stroke-linejoin="round"/>
+                <circle cx="106" cy="131" r="2" fill="#D8674C"/>
+                <text class="map-island-label" x="76" y="128">世界热点</text>
+                <text class="map-island-count" x="78" y="142">8 条路线</text>
+              </g>
+
+              <g class="map-island" data-theme="science" data-name="科学" role="button" tabindex="0" aria-label="进入科学">
+                <ellipse class="map-island-shadow" cx="252" cy="113" rx="48" ry="28"/>
+                <ellipse class="map-island-land" cx="252" cy="111" rx="48" ry="28"/>
+                <ellipse class="map-island-top" cx="252" cy="105" rx="42" ry="22"/>
+                <path d="M246 88a6 6 0 1 1-12 0 6 6 0 1 1 12 0Z" class="map-castle"/>
+                <line x1="240" y1="94" x2="240" y2="99" stroke="#8A664C" stroke-width="1.4"/>
+                <rect x="226" y="42" width="58" height="20" rx="10" class="map-current-badge"/>
+                <text class="map-current-text" x="255" y="56" text-anchor="middle">当前位置</text>
+                <text class="map-island-label" x="232" y="80">科学</text>
+                <text class="map-island-count" x="234" y="94">12 条路线</text>
+                <text class="map-next-label" x="150" y="102">下一站：世界热点</text>
+              </g>
+
+              <g class="map-island" data-theme="culture" data-name="文化" role="button" tabindex="0" aria-label="进入文化">
+                <ellipse class="map-island-shadow" cx="322" cy="244" rx="38" ry="23"/>
+                <ellipse class="map-island-land" cx="322" cy="242" rx="38" ry="23"/>
+                <ellipse class="map-island-top" cx="322" cy="237" rx="32" ry="18"/>
+                <path d="M312 226l8-9 8 9Z" class="map-castle"/>
+                <rect x="316" y="227" width="8" height="8" fill="#F8EBD3" stroke="#8A664C" stroke-width="1.2"/>
+                <text class="map-island-label" x="318" y="222">文化</text>
+                <text class="map-island-count" x="320" y="234">6 条路线</text>
+              </g>
+
+              <g class="map-island" data-theme="business" data-name="商业" role="button" tabindex="0" aria-label="进入商业">
+                <ellipse class="map-island-shadow" cx="242" cy="303" rx="42" ry="25"/>
+                <ellipse class="map-island-land" cx="242" cy="301" rx="42" ry="25"/>
+                <ellipse class="map-island-top" cx="242" cy="296" rx="36" ry="20"/>
+                <path d="M232 282v14M232 282h11l-3 5 3 5h-11" fill="none" stroke="#8A664C" stroke-width="1.4" stroke-linejoin="round"/>
+                <text class="map-island-label" x="228" y="282">商业</text>
+                <text class="map-island-count" x="230" y="296">7 条路线</text>
+              </g>
+
+              <g class="map-island" data-theme="growth" data-name="成长" role="button" tabindex="0" aria-label="进入成长">
+                <ellipse class="map-island-shadow" cx="100" cy="319" rx="40" ry="24"/>
+                <ellipse class="map-island-land" cx="100" cy="317" rx="40" ry="24"/>
+                <ellipse class="map-island-top" cx="100" cy="312" rx="34" ry="19"/>
+                <path d="M90 298l-5 10h10Z" class="map-castle"/>
+                <line x1="90" y1="308" x2="90" y2="302" stroke="#8A664C" stroke-width="1.4"/>
+                <text class="map-island-label" x="86" y="300">成长</text>
+                <text class="map-island-count" x="88" y="314">9 条路线</text>
+              </g>
+
+              <g class="map-island" data-theme="stories" data-name="趣味故事" role="button" tabindex="0" aria-label="进入趣味故事">
+                <ellipse class="map-island-shadow" cx="180" cy="365" rx="44" ry="25"/>
+                <ellipse class="map-island-land" cx="180" cy="363" rx="44" ry="25"/>
+                <ellipse class="map-island-top" cx="180" cy="358" rx="38" ry="20"/>
+                <circle cx="172" cy="346" r="6" fill="#52A77E" stroke="#8A664C" stroke-width="1.3"/>
+                <line x1="172" y1="352" x2="172" y2="359" stroke="#8A664C" stroke-width="1.4"/>
+                <text class="map-island-label" x="168" y="350">趣味故事</text>
+                <text class="map-island-count" x="172" y="363">12 条路线</text>
+              </g>
+
+              <g>
+                <ellipse class="map-island-shadow" cx="308" cy="349" rx="26" ry="16"/>
+                <ellipse class="map-island-land" cx="308" cy="347" rx="26" ry="16"/>
+                <ellipse class="map-island-top" cx="308" cy="343" rx="21" ry="12"/>
+                <path d="M300 330v14M300 330l10-4-10-4" fill="none" stroke="#8A664C" stroke-width="1.5" stroke-linejoin="round"/>
+                <text class="map-island-count" x="300" y="334">更多关卡</text>
+              </g>
+            </svg>
+            <div class="map-legend">
+              <div><i class="coral"></i>推荐航线</div>
+              <div><i style="background:rgba(104,75,53,.42)"></i>现有航线</div>
+              <div><span style="color:var(--brand-coral)">●</span> 当前位置</div>
+            </div>
+          </div>
+          <div class="bottom button-row"><button class="button coral" id="continue-science" type="button">继续科学大陆 <svg class="icon"><use href="#i-arrow-right"/></svg></button><button class="button secondary" id="view-all-map" type="button">查看整体地图</button></div>
+          <nav class="nav" aria-label="主导航">
+            <button class="nav-item on" type="button" data-go="stage-07"><svg class="icon"><use href="#i-home"/></svg>世界</button>
+            <button class="nav-item" type="button" data-go="stage-03"><svg class="icon"><use href="#i-compass"/></svg>发现</button>
+            <button class="nav-item" type="button" data-go="stage-04"><svg class="icon"><use href="#i-book"/></svg>词句</button>
+            <button class="nav-item" type="button" data-go="stage-06"><svg class="icon"><use href="#i-user"/></svg>我的</button>
+          </nav>
+        </div>
+      </section>
+    </article>
+
+    <article class="frame" id="stage-08" data-stage="8">
+      <header class="frame-label"><span>08</span><h2>科学大陆</h2></header>
+      <section class="screen map-screen with-nav">
+        <div class="grain"></div>
+        <div class="content">
+          <div class="continent-hero">
+            <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
+            <span class="eyebrow" style="color:#F0B888">科学大陆 · SCIENCE CONTINENT</span>
+            <h1>把真实世界，<br>走成一条故事线。</h1>
+            <p>按你现在的兴趣排序，火星之后会继续走向真实航天与城市网络。</p>
+            <div class="continent-orbit"></div>
+          </div>
+          <div class="section-label"><h3>你的故事路线</h3><span class="pill">3 个节点</span></div>
+          <div class="route-path">
+            <article class="story-node done" data-node="1" role="button" tabindex="0"><div><h3>火星城市停电的第 47 分钟</h3><p>已完成 · 收下 emerged · 帕利获得火星坐标</p></div><span class="status">已完成</span></article>
+            <article class="story-node next" data-node="2" role="button" tabindex="0"><div><h3>城市之后，第 48 分钟</h3><p>为你续上的故事 · 约 5 分钟 · 会遇见 1 个旧词</p></div><span class="status">推荐继续</span></article>
+            <article class="story-node" data-node="3" role="button" tabindex="0"><div><h3>真实航天如何避免系统瘫痪</h3><p>背景知识路线 · 解锁后显示</p></div><span class="status">待解锁</span></article>
+          </div>
+          <div class="bottom button-row"><button class="button" id="continue-route" type="button">继续第 48 分钟 <svg class="icon"><use href="#i-arrow-right"/></svg></button><button class="button secondary" id="swap-route" type="button">换一条路线</button></div>
+          <nav class="nav" aria-label="主导航">
+            <button class="nav-item on" type="button" data-go="stage-07"><svg class="icon"><use href="#i-home"/></svg>世界</button>
+            <button class="nav-item" type="button" data-go="stage-03"><svg class="icon"><use href="#i-compass"/></svg>发现</button>
+            <button class="nav-item" type="button" data-go="stage-04"><svg class="icon"><use href="#i-book"/></svg>词句</button>
+            <button class="nav-item" type="button" data-go="stage-06"><svg class="icon"><use href="#i-user"/></svg>我的</button>
+          </nav>
+        </div>
+      </section>
+    </article>
+
+    <article class="frame" id="stage-09" data-stage="9">
+      <header class="frame-label"><span>09</span><h2>AI 陪读</h2></header>
+      <section class="screen reader">
+        <div class="grain"></div>
+        <div class="content">
+          <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
+          <div class="reader-head"><button class="back" id="reader-close-2" type="button" aria-label="关闭阅读"><svg class="icon"><use href="#i-arrow-left"/></svg></button><div class="progress"><i style="width:62%"></i></div><strong style="font-size:12px">1:32</strong></div>
+          <div class="topbar"><span class="eyebrow">阅读世界 · 科学大陆 · 2/4</span><span class="pill">背景知识</span></div>
+          <h1 class="reader-title">The 48th Minute<br>After the Blackout</h1>
+          <div class="reader-meta">SCIENCE · CONTINUING STORY</div>
+          <div class="article">
+            <p>By midnight, the city had learned to move without its central network.</p>
+            <p>Mara followed the repair robot into an older tunnel. It was slower, darker, and much less certain. <span class="word-mark" id="sentence-mark-2" role="button" tabindex="0">“But this one still belongs to the people,”</span> the robot said.</p>
+            <p>For the first time, Mara began to see the city not as a system, but as a place held together by small choices.</p>
+          </div>
+          <button class="reading-complete" id="complete-reading-2" type="button">读完了，看成长报告 <svg class="icon"><use href="#i-arrow-right"/></svg></button>
+          <div class="split-panel" id="split-panel-2">
+            <h3><svg class="icon" style="vertical-align:-4px;margin-right:5px"><use href="#i-split"/></svg>帕利帮你拆开长句</h3>
+            <p>But this one still belongs to the people.</p>
+            <p>不是“这个系统属于人”，而是“这条旧隧道仍属于普通人”。belongs to 在这里强调归属和信任。</p>
+          </div>
+          <div class="toolbar">
+            <button class="tool" id="brightness-2" type="button"><svg class="icon"><use href="#i-sun"/></svg>亮度</button>
+            <button class="tool" id="font-2" type="button"><svg class="icon"><use href="#i-type"/></svg>字号</button>
+            <button class="tool" id="background-2" type="button"><svg class="icon"><use href="#i-book-open"/></svg>背景</button>
+            <button class="tool" id="ask-2" type="button"><svg class="icon"><use href="#i-message"/></svg>问帕利</button>
+          </div>
+        </div>
+      </section>
+    </article>
+
+    <article class="frame" id="stage-10" data-stage="10">
+      <header class="frame-label"><span>10</span><h2>成长报告</h2></header>
+      <section class="screen report-screen">
+        <div class="grain"></div>
+        <div class="content">
+          <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
+          <div class="topbar"><button class="back" id="report-back" type="button" aria-label="返回"><svg class="icon"><use href="#i-arrow-left"/></svg></button><span class="eyebrow">成长报告 · 科学大陆</span></div>
+          <section class="report-hero" style="margin-top:16px">
+            <span class="stamp">ROUTE COMPLETE</span>
+            <h2>你不是读完了，<br>你和帕利多了一段经历。</h2>
+            <p>这页把故事中的新词、金句、背景知识和旅伴变化留在一起。</p>
+          </section>
+          <div class="report-grid">
+            <article class="report-card">
+              <header><span class="report-icon"><svg class="icon"><use href="#i-book-open"/></svg></span><h3>新认识</h3></header>
+              <div class="word-pair"><strong>emerged</strong><span>从隐藏处出现</span></div>
+              <p>Then an old repair robot emerged from a tunnel.</p>
+            </article>
+            <article class="report-card">
+              <header><span class="report-icon coral"><svg class="icon"><use href="#i-quote"/></svg></span><h3>金句</h3></header>
+              <p class="quote-line">“The route was longer, but it did not depend on the city’s network.”</p>
+              <p>更长的路，反而让它不再依赖单一系统。</p>
+            </article>
+            <article class="report-card">
+              <header><span class="report-icon amber"><svg class="icon"><use href="#i-flask"/></svg></span><h3>背景知识</h3></header>
+              <p>火星城市需要分布式网络，因为一次尘暴就可能让中心系统全部失效。</p>
+            </article>
+            <article class="report-card">
+              <header><span class="report-icon"><svg class="icon"><use href="#i-sparkles"/></svg></span><h3>帕利的变化</h3></header>
+              <p>它更确定你喜欢“现实边缘的未来故事”，下一次会把科学、世界热点排在故事前面。</p>
+            </article>
+          </div>
+          <div class="unlock-strip"><svg class="icon"><use href="#i-map"/></svg><span>本次解锁：科学大陆“失效系统”路线 · 第 2 段海岸线已点亮，下一篇已打开。</span></div>
+          <div class="bottom button-row"><button class="button teal" id="report-next" type="button">继续下一段路线 <svg class="icon"><use href="#i-arrow-right"/></svg></button><button class="button secondary" id="report-map" type="button">回到地图</button></div>
+        </div>
+      </section>
+    </article>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    (function () {
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+      const toastEl = $('#toast');
+      let toastTimer;
+
+      function showToast(message) {
+        toastEl.textContent = message;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2000);
+      }
+
+      function pressable(element, handler) {
+        if (!element) return;
+        element.addEventListener('click', handler);
+        element.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handler();
+          }
+        });
+      }
+
+      const frames = $$('.frame[id^="stage-"]');
+      const frameMap = Object.fromEntries(frames.map((frame) => [frame.id, frame]));
+      const navItems = $$('.nav-item[data-go]');
+      let navigationStack = ['stage-01'];
+
+      function showFrame(id, options = {}) {
+        const frame = frameMap[id];
+        if (!frame) return;
+        frames.forEach((item) => {
+          const active = item === frame;
+          item.classList.toggle('active', active);
+          item.setAttribute('aria-hidden', String(!active));
+        });
+        navItems.forEach((item) => item.classList.toggle('on', item.dataset.go === id));
+        window.scrollTo(0, 0);
+        if (options.push !== false) {
+          navigationStack.push(id);
+          history.pushState({ frame: id }, '', `#${id}`);
+        }
+      }
+
+      function goBack() {
+        if (navigationStack.length > 1) {
+          navigationStack.pop();
+          showFrame(navigationStack[navigationStack.length - 1], { push: false });
+        } else {
+          showFrame('stage-01', { push: false });
+        }
+      }
+
+      window.addEventListener('popstate', (event) => {
+        if (!event.state || !event.state.frame) return;
+        const index = navigationStack.indexOf(event.state.frame);
+        if (index >= 0) {
+          navigationStack = navigationStack.slice(0, index + 1);
+        } else {
+          navigationStack.push(event.state.frame);
+        }
+        showFrame(event.state.frame, { push: false });
+      });
+
+      const initialHash = (location.hash || '#stage-01').slice(1);
+      if (frameMap[initialHash]) {
+        showFrame(initialHash, { push: false });
+      }
+
+      document.querySelectorAll('.frame').forEach((frame) => {
+        frame.setAttribute('aria-hidden', String(!frame.classList.contains('active')));
+      });
+
+      let companion = { id: 'pal', name: '帕利' };
+      const companionCards = $$('.companion-card');
+      const companionCta = $('#companion-cta');
+
+      function selectCompanion(card) {
+        companion = { id: card.dataset.companion, name: card.dataset.name };
+        companionCards.forEach((item) => {
+          const selected = item === card;
+          item.classList.toggle('selected', selected);
+          item.setAttribute('aria-pressed', String(selected));
+        });
+        companionCta.innerHTML = `让${companion.name}陪我出发 <svg class="icon"><use href="#i-arrow-right"/></svg>`;
+        $$('[data-companion-avatar]').forEach((image) => {
+          image.src = `./assets/${companion.id}.png`;
+        });
+      }
+
+      companionCards.forEach((card) => pressable(card, () => selectCompanion(card)));
+      $('#skip-onboarding').addEventListener('click', () => selectCompanion(companionCards[0]));
+      $('#skip-onboarding').addEventListener('click', () => showFrame('stage-02'));
+      $('#companion-cta').addEventListener('click', () => showFrame('stage-02'));
+      $('#random-companion').addEventListener('click', () => {
+        const randomCard = companionCards[Math.floor(Math.random() * companionCards.length)];
+        selectCompanion(randomCard);
+        showToast(`这次让${companion.name}陪你出发`);
+        setTimeout(() => showFrame('stage-02'), 350);
+      });
+
+      const stage02Thread = $('#stage-02 .ai-thread');
+      const signalChain = $('#stage-02 .signal-chain');
+      const chatInput = $('#chat-input');
+      const chatSend = $('#chat-send');
+      let chatTurn = 0;
+
+      function resetChat() {
+        stage02Thread.innerHTML = `
+          <div class="bubble ai">如果只能留一个你最近会反复看的内容，你会选什么？</div>
+          <div class="bubble ai"><span class="typing"><i></i><i></i><i></i></span><small>帕利正在等你开口</small></div>
+        `;
+        chatTurn = 0;
+        chatInput.placeholder = '赛博朋克、AI 新闻、真实航天…';
+        chatInput.value = '';
+        signalChain.classList.remove('show');
+      }
+
+      function addTypingBubble() {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble ai';
+        bubble.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+        stage02Thread.append(bubble);
+        return bubble;
+      }
+
+      function setTypingToAI(bubble, text) {
+        bubble.innerHTML = `${text}<small>帕利读完你的表达</small>`;
+      }
+
+      function addUserBubble(text) {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble me';
+        bubble.textContent = text;
+        stage02Thread.append(bubble);
+      }
+
+      function handleChat() {
+        if (chatTurn === 0) {
+          const text = chatInput.value.trim() || chatInput.placeholder.replace('…', '');
+          addUserBubble(text);
+          chatInput.value = '';
+          chatInput.placeholder = '今晚更想轻松一点，还是接受一点挑战？';
+          chatTurn = 1;
+          setTimeout(() => {
+            const typing = addTypingBubble();
+            setTimeout(() => {
+              setTypingToAI(typing, '我听到：未来世界、真实技术，还有现实边缘。你更想轻松进入，还是今晚接受一点挑战？');
+            }, 720);
+          }, 320);
+          return;
+        }
+        if (chatTurn === 1) {
+          const text = chatInput.value.trim() || chatInput.placeholder.replace('？', '？');
+          addUserBubble(text);
+          chatInput.value = '';
+          chatTurn = 2;
+          signalChain.classList.add('show');
+          setTimeout(() => {
+            const typing = addTypingBubble();
+            setTimeout(() => {
+              setTypingToAI(typing, '线索已经足够。我先带你去一条现实边缘的未来故事。');
+            }, 760);
+          }, 360);
+          setTimeout(() => showFrame('stage-03'), 1750);
+          return;
+        }
+        showFrame('stage-03');
+      }
+
+      resetChat();
+      chatSend.addEventListener('click', handleChat);
+      chatInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') handleChat();
+      });
+      $('#skip-chat').addEventListener('click', () => showFrame('stage-03'));
+
+      const stories = [
+        {
+          code: '47',
+          route: '<span class="tag teal">科学大陆</span><span class="sep"></span><span class="tag">火星系列 · 当城市失效</span><span class="sep"></span><span class="tag coral">第 1 / 4 段</span>',
+          title: '火星城市停电的第 47 分钟',
+          synopsis: '一座城市突然停电，旧维修机器人带着玛拉穿过一个不再依赖中心网络的隧道。',
+          unlock: '读完本段：解锁“第 48 分钟”，点亮科学大陆第 1 段海岸线',
+          cta: '开始这篇故事'
+        },
+        {
+          code: '08',
+          route: '<span class="tag teal">世界热点</span><span class="sep"></span><span class="tag">最后还在线的卫星</span><span class="sep"></span><span class="tag coral">第 1 / 3 段</span>',
+          title: '最后一颗还在线的卫星',
+          synopsis: '当全球云服务中断，一颗旧气象卫星成了普通人最早收到警报的来源。',
+          unlock: '读完本段：解锁“AI 公司如何备份现实”，点亮世界热点航线',
+          cta: '开始这篇故事'
+        },
+        {
+          code: '12',
+          route: '<span class="tag teal">科学大陆</span><span class="sep"></span><span class="tag">真实航天 · 失效系统</span><span class="sep"></span><span class="tag coral">第 3 / 4 段</span>',
+          title: '真实航天如何避免系统瘫痪',
+          synopsis: '火星城市是一次想象练习，而真实航天站用冗余、降级和地面模拟撑过每次故障。',
+          unlock: '读完本段：解锁“从火星到世界热点”的跨岛航线',
+          cta: '开始这篇故事'
+        }
+      ];
+      let storyIndex = 0;
+
+      function renderStory(index) {
+        const story = stories[index];
+        $('#story-cover').dataset.code = story.code;
+        $('#rec-route-line').innerHTML = story.route;
+        $('#rec-title').textContent = story.title;
+        $('#rec-synopsis').textContent = story.synopsis;
+        $('#rec-unlock').innerHTML = `<svg class="icon"><use href="#i-map"/></svg><span>${story.unlock}</span>`;
+        $('#recommend-cta').innerHTML = `${story.cta} <svg class="icon"><use href="#i-arrow-right"/></svg>`;
+        storyIndex = index;
+      }
+
+      renderStory(0);
+      $('#recommend-more').addEventListener('click', () => {
+        renderStory((storyIndex + 1) % stories.length);
+        showToast('换到了同兴趣方向的一条新路线');
+      });
+      $('#recommend-swap').addEventListener('click', () => {
+        renderStory((storyIndex + 1) % stories.length);
+        showToast('同兴趣方向，换一条更合适的故事');
+      });
+      $('#recommend-cta').addEventListener('click', () => showFrame('stage-04'));
+
+      const reader1 = $('#stage-04 .screen');
+      const reader2 = $('#stage-09 .screen');
+      const aiNote1 = $('#ai-note-1');
+
+      $('#reader-close-1').addEventListener('click', goBack);
+      $('#brightness-1').addEventListener('click', () => reader1.classList.toggle('dim'));
+      $('#font-1').addEventListener('click', () => reader1.classList.toggle('large'));
+      $('#sentence-1').addEventListener('click', () => {
+        aiNote1.innerHTML = '<div><strong>帕利帮你拆开长句</strong><p>Then an old repair robot emerged from a tunnel under the street. → 然后，一个旧维修机器人从街道下方的隧道里出现了。</p></div>';
+        showToast('长句已用帕利的方式拆开');
+      });
+      $('#ask-1').addEventListener('click', () => {
+        aiNote1.innerHTML = '<div><strong>问帕利 · emerged</strong><p>它更像“从看不见的地方慢慢显现”，不只是 came out。</p></div>';
+        showToast('帕利回答了 emerged');
+      });
+      $('#word-mark-1').addEventListener('click', () => {
+        showToast('emerged 的线索已经放到屏幕底部');
+      });
+      $('#complete-reading-1').addEventListener('click', () => showFrame('stage-05'));
+      $('#feedback-next').addEventListener('click', () => showFrame('stage-06'));
+
+      $('#profile-back').addEventListener('click', goBack);
+      $('#profile-confirm').addEventListener('click', () => showFrame('stage-07'));
+      const profileSheet = $('#profile-edit-sheet');
+      $('#edit-profile').addEventListener('click', () => profileSheet.classList.toggle('show'));
+      $$('[data-profile-option]').forEach((option) => {
+        option.addEventListener('click', () => {
+          const group = option.textContent.includes('分钟') ? '分钟' : '提示';
+          $$(`[data-profile-option]`).forEach((item) => {
+            const sameGroup = (item.textContent.includes('分钟') ? '分钟' : '提示') === group;
+            if (sameGroup) item.classList.toggle('on', item === option);
+          });
+        });
+      });
+
+      const splitPanel2 = $('#split-panel-2');
+      function setSplitPanel(title, first, second) {
+        splitPanel2.innerHTML = `
+          <h3><svg class="icon" style="vertical-align:-4px;margin-right:5px"><use href="#i-split"/></svg>${title}</h3>
+          <p>${first}</p>
+          <p>${second}</p>
+        `;
+        splitPanel2.classList.add('show');
+      }
+
+      $('#reader-close-2').addEventListener('click', goBack);
+      $('#brightness-2').addEventListener('click', () => reader2.classList.toggle('dim'));
+      $('#font-2').addEventListener('click', () => reader2.classList.toggle('large'));
+      $('#background-2').addEventListener('click', () => {
+        setSplitPanel('背景知识', 'Mars needs distributed networks because one dust storm can disable a central system.', '火星城市需要分布式网络，因为一次尘暴就可能让中心系统全部失效。');
+      });
+      $('#ask-2').addEventListener('click', () => {
+        setSplitPanel('问帕利', 'belongs to the people.', '这里不是“系统属于人”，而是这条旧隧道仍属于普通人。');
+      });
+      $('#sentence-mark-2').addEventListener('click', () => {
+        setSplitPanel('帕利帮你拆开长句', 'But this one still belongs to the people.', 'belongs to 在这里强调归属和信任。');
+      });
+      $('#complete-reading-2').addEventListener('click', () => {
+        showToast('第 48 分钟已读完，成长报告已生成');
+        setTimeout(() => showFrame('stage-10'), 350);
+      });
+
+      $$('.map-island').forEach((island) => {
+        pressable(island, () => {
+          if (island.dataset.theme === 'science') {
+            showFrame('stage-08');
+          } else {
+            showToast(`${island.dataset.name}岛会在下一轮扩展，先聚焦科学大陆`);
+          }
+        });
+      });
+      $('#view-map').addEventListener('click', () => showToast('整体地图 = 阅读世界的六个主题岛'));
+      $('#continue-science').addEventListener('click', () => showFrame('stage-08'));
+      $('#view-all-map').addEventListener('click', () => showToast('整体地图 = 阅读世界的六个主题岛'));
+
+      const routeState = { 1: 'done', 2: 'next', 3: 'locked' };
+      function renderRouteState() {
+        $$('#stage-08 .story-node').forEach((node) => {
+          const state = routeState[node.dataset.node];
+          node.classList.remove('done', 'next');
+          if (state === 'done') node.classList.add('done');
+          if (state === 'next') node.classList.add('next');
+          const status = node.querySelector('.status');
+          if (state === 'done') status.textContent = '已完成';
+          if (state === 'next') status.textContent = '推荐继续';
+          if (state === 'locked') status.textContent = '待解锁';
+        });
+      }
+      renderRouteState();
+
+      $$('#stage-08 .story-node').forEach((node) => {
+        pressable(node, () => {
+          const state = routeState[node.dataset.node];
+          if (node.dataset.node === '2' || state === 'done' || state === 'next') {
+            showFrame(node.dataset.node === '2' ? 'stage-09' : 'stage-04');
+          } else {
+            showToast('先读完前面的故事，就会点亮这一段');
+          }
+        });
+      });
+      $('#continue-route').addEventListener('click', () => showFrame('stage-09'));
+      $('#swap-route').addEventListener('click', () => {
+        showToast('换到同岛另一条路线：观测站');
+      });
+
+      function completeSecondNode() {
+        routeState[2] = 'done';
+        routeState[3] = 'next';
+        renderRouteState();
+        const unlock = $('#stage-10 .unlock-strip span');
+        unlock.textContent = '本次解锁：科学大陆“失效系统”路线 · 第 3 段已打开，下一回合可继续';
+      }
+
+      $('#report-back').addEventListener('click', goBack);
+      $('#report-map').addEventListener('click', () => showFrame('stage-07'));
+      $('#report-next').addEventListener('click', () => {
+        completeSecondNode();
+        showFrame('stage-08');
+      });
+
+      navItems.forEach((item) => item.addEventListener('click', () => showFrame(item.dataset.go)));
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') goBack();
+      });
+    })();
+  </script>
+</body>
+</html>
