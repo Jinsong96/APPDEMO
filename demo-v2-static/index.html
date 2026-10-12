@@ -251,35 +251,12 @@
       object-position: center bottom;
       filter: drop-shadow(0 12px 14px rgba(55, 35, 20, .18));
     }
-    .companion-card, .card, .report-card {
+    .card, .report-card {
       background: rgba(255, 249, 238, .9);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-card);
     }
-    .companion-grid {
-      display: grid;
-      grid-template-columns: 1.14fr .93fr .93fr;
-      gap: 8px;
-      margin-top: 20px;
-    }
-    .companion-card {
-      position: relative;
-      min-width: 0;
-      height: 316px;
-      padding: 14px 9px;
-      overflow: hidden;
-    }
-    .companion-card.selected {
-      border: 2px solid var(--brand-primary);
-      background: #FFF3DA;
-      box-shadow: 0 9px 0 rgba(104, 75, 53, .16);
-    }
-    .companion-card img { width: 100%; height: 142px; object-fit: contain; }
-    .companion-card.selected img { height: 154px; }
-    .companion-card h3 { margin: 8px 0 3px; font-size: 14px; line-height: 1.2; }
-    .companion-card .type { color: var(--brand-teal); font-size: 10px; font-weight: 900; }
-    .companion-card p { margin: 7px 0 0; color: var(--text-muted); font-size: 11px; line-height: 1.45; }
     .selection-check {
       position: absolute;
       top: 10px;
@@ -346,6 +323,76 @@
     .typing { display: inline-flex; gap: 4px; align-items: center; min-height: 18px; }
     .typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--brown-500); opacity: .55; }
     .tiny-note { display: flex; align-items: center; gap: 7px; margin-top: 10px; color: var(--text-muted); font-size: 11px; font-weight: 800; }
+
+    /* 选择旅伴 · 滑动卡组 */
+    .deck {
+      position: relative;
+      height: 356px;
+      margin-top: 18px;
+      touch-action: pan-y;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .deck-card {
+      position: absolute;
+      top: 38px;
+      left: 50%;
+      width: 200px;
+      height: 272px;
+      margin-left: -100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px 14px 16px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 26px;
+      background: #FFFCF6;
+      box-shadow: 0 2px 4px rgba(59, 38, 24, .07), 0 12px 20px rgba(59, 38, 24, .10), 0 24px 38px rgba(59, 38, 24, .11);
+      transform-origin: 50% 86%;
+      transition: transform 280ms cubic-bezier(.2, .7, .2, 1), opacity 280ms ease, box-shadow 280ms ease;
+      will-change: transform;
+    }
+    .deck-card img { width: 100%; height: 136px; object-fit: contain; margin-top: 2px; }
+    .deck-card h3 { margin: 12px 0 3px; font-size: 16px; letter-spacing: -.2px; }
+    .deck-card .type { color: var(--brand-teal); font-size: 10.5px; font-weight: 900; letter-spacing: .3px; }
+    .deck-card p { margin: 9px 0 0; color: var(--text-muted); font-size: 11.5px; line-height: 1.5; text-align: center; }
+    .deck-card .selection-check { display: none; }
+    .deck-card[data-pos="left"] { z-index: 1; opacity: .94; transform: translateX(-92px) rotate(-9deg) scale(.82); }
+    .deck-card[data-pos="right"] { z-index: 1; opacity: .94; transform: translateX(92px) rotate(9deg) scale(.82); }
+    .deck-card[data-pos="hidden"] { z-index: 2; opacity: 0; pointer-events: none; transform: translateX(0) scale(.9); }
+    .deck-card[data-pos="front"] {
+      z-index: 3;
+      border: 2px solid var(--brand-primary);
+      transform: translateX(0) rotate(0) scale(1);
+      box-shadow: 0 3px 6px rgba(59, 38, 24, .09), 0 16px 26px rgba(59, 38, 24, .14), 0 30px 46px rgba(59, 38, 24, .15);
+    }
+    .deck-card[data-pos="front"] .selection-check { display: grid; }
+    /* 侧边卡片的文字往"露出来的一侧"靠，避免被前卡截成半截 */
+    .deck-card[data-pos="left"] h3, .deck-card[data-pos="left"] .type, .deck-card[data-pos="left"] p { text-align: left; padding-left: 4px; }
+    .deck-card[data-pos="right"] h3, .deck-card[data-pos="right"] .type, .deck-card[data-pos="right"] p { text-align: right; padding-right: 4px; }
+    .deck-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 14px; }
+    .deck-arrow {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 50%;
+      background: rgba(255, 252, 246, .92);
+      color: var(--brand-primary);
+      cursor: pointer;
+      transition: background 150ms, transform 150ms;
+    }
+    .deck-arrow .icon { width: 18px; height: 18px; }
+    .deck-arrow:active { transform: scale(.94); }
+    .deck-arrow:focus-visible { outline: 3px solid color-mix(in srgb, var(--focus-ring) 52%, transparent); outline-offset: 2px; }
+    .deck-dots { display: flex; align-items: center; gap: 7px; }
+    .deck-dots i { display: block; width: 7px; height: 7px; border-radius: 999px; background: #D3BE9C; transition: width 220ms ease, background 220ms ease; }
+    .deck-dots i.on { width: 20px; background: var(--brand-primary); }
+    .deck-hint { margin: 11px 0 0; text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 700; }
+    @media (prefers-reduced-motion: reduce) {
+      .deck-card, .deck-dots i, .deck-arrow { transition: none; }
+    }
 
     /* 首登 · 对话式兴趣采集：点击按钮 = 发送消息 */
     .chat-hello {
@@ -658,58 +705,26 @@
       position: relative;
       height: 390px;
       margin: 12px -8px 0;
+      overflow: hidden;
+      border-radius: 30px;
+      background: linear-gradient(158deg, #FCF4E4 0%, #F4E7CF 56%, #EBDAB9 100%);
+      border: 1px solid rgba(104, 75, 53, .2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .75), inset 0 -30px 46px rgba(150, 118, 78, .12);
     }
-    .map-canvas svg { display: block; width: 100%; height: 100%; }
+    .map-canvas::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .5;
+      background-image: repeating-linear-gradient(0deg, rgba(255, 255, 255, .5) 0 1.5px, transparent 1.5px 17px);
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+    }
+    .map-canvas svg { position: relative; display: block; width: 100%; height: 100%; }
 
-    /* 主题大陆总览 · 深色海报式地图 */
-    .screen.darkmap {
-      background: radial-gradient(125% 82% at 50% -6%, #2C2724 0%, #191614 44%, #0B0A09 100%);
-      color: #F6F1E7;
-    }
-    .darkmap .eyebrow { color: #C3A169; letter-spacing: 1.6px; }
-    .darkmap .page-title { color: #FBF7F0; }
-    .darkmap .lede { color: #9C9184; }
-    .darkmap .map-copy p { color: #9C9184; }
-    .darkmap .icon-button {
-      background: rgba(255, 246, 233, .07);
-      border-color: rgba(255, 246, 233, .2);
-      color: #F0D49B;
-    }
-    .darkmap .button.secondary {
-      background: rgba(255, 246, 233, .07);
-      color: #F0D49B;
-      border-color: rgba(255, 246, 233, .22);
-    }
-    .darkmap .nav { background: rgba(30, 27, 24, .94); border-color: rgba(255, 246, 233, .14); }
-    .darkmap .nav-item { color: #94897C; }
-    .darkmap .nav-item.on { color: #F0D49B; background: rgba(240, 212, 155, .13); }
-
-    /* 科学大陆 · 深色版 */
-    .darkmap .continent-hero {
-      background: linear-gradient(180deg, rgba(122, 88, 58, .60) 0%, rgba(78, 56, 38, .26) 58%, rgba(11, 10, 9, 0) 100%);
-    }
-    .darkmap .continent-hero h1 { color: #FBF7F0; }
-    .darkmap .continent-hero p { color: #B7A896; }
-    .darkmap .continent-orbit { border-color: rgba(240, 212, 155, .26); }
-    .darkmap .section-label h3 { color: #F6F1E7; }
-    .darkmap .pill { background: rgba(255, 246, 233, .08); border-color: rgba(255, 246, 233, .2); color: #CDBB9C; }
-    .darkmap .route-path::before { border-left-color: rgba(255, 246, 233, .18); }
-    .darkmap .story-node {
-      background: rgba(255, 246, 233, .055);
-      border-color: rgba(255, 246, 233, .16);
-      box-shadow: none;
-    }
-    .darkmap .story-node h3 { color: #F6F1E7; }
-    .darkmap .story-node p { color: #9C9184; }
-    .darkmap .story-node::before { border-color: #12100E; }
-    .darkmap .story-node.done { border-color: rgba(227, 165, 66, .45); }
-    .darkmap .story-node.next { border-color: rgba(216, 103, 76, .6); background: rgba(216, 103, 76, .1); }
-    .darkmap .button { background: var(--brand-coral); box-shadow: 0 7px 0 #A94A35; }
-    .darkmap .button.teal { background: var(--brand-teal); box-shadow: 0 7px 0 #287D78; }
-
-    .ct-ring { fill: none; stroke: #F0A82E; stroke-width: 1.4; stroke-dasharray: 3.2 4.4; stroke-linecap: round; }
-    .ct-label { fill: #F6F1E7; font-family: inherit; font-size: 11.5px; font-weight: 600; letter-spacing: .4px; }
-    .ct-count { fill: #8C8275; font-family: inherit; font-size: 9px; font-weight: 500; letter-spacing: .3px; }
+    .ct-ring { fill: none; stroke: #D8674C; stroke-width: 1.4; stroke-dasharray: 3.2 4.4; stroke-linecap: round; }
+    .ct-label { fill: #46301F; font-family: inherit; font-size: 11.5px; font-weight: 700; letter-spacing: .4px; }
+    .ct-count { fill: #8A7765; font-family: inherit; font-size: 9px; font-weight: 600; letter-spacing: .3px; }
 
     .map-legend {
       position: absolute;
@@ -722,15 +737,15 @@
       align-items: center;
       gap: 20px;
       font-size: 9.5px;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: .3px;
-      color: #9A9083;
+      color: #8A7765;
       pointer-events: none;
     }
     .map-legend div { display: flex; align-items: center; gap: 7px; }
     .map-legend i { display: block; flex: none; border-radius: 999px; }
-    .map-legend i.here { width: 7px; height: 7px; background: #5FC46E; box-shadow: 0 0 8px rgba(95, 196, 110, .8); }
-    .map-legend i.next { width: 9px; height: 9px; border: 1.4px dashed #F0A82E; }
+    .map-legend i.here { width: 7px; height: 7px; background: #42AFA8; box-shadow: 0 0 6px rgba(66, 175, 168, .65); }
+    .map-legend i.next { width: 9px; height: 9px; border: 1.4px dashed #D9930F; }
     .map-line { position: absolute; inset: 0; width: 100%; height: 100%; color: rgba(104,75,53,.35); }
     .continent {
       position: absolute;
@@ -903,7 +918,7 @@
   </header>
 
   <main class="board">
-    <article class="frame">
+        <article class="frame">
       <header class="frame-label"><span>01</span><h2>选择旅伴</h2></header>
       <section class="screen">
         <div class="grain"></div>
@@ -912,27 +927,35 @@
           <div class="topbar"><span class="eyebrow">阅读世界 · 初次见面</span><span class="pill">跳过</span></div>
           <h1 class="page-title">读英文时，<br>你想让谁坐在旁边？</h1>
           <p class="lede">不是选老师，是选一种陪你读完的方式。</p>
-          <div class="companion-grid">
-            <article class="companion-card selected">
+          <div class="deck">
+            <article class="deck-card" data-pos="front">
               <span class="selection-check"><svg class="icon"><use href="#i-check"/></svg></span>
               <img src="./assets/pal.png" alt="帕利旅伴形象">
               <h3>帕利 Pal</h3>
               <div class="type">机灵型旅伴</div>
               <p>“我会吐槽难句，不吐槽你。”</p>
             </article>
-            <article class="companion-card">
+            <article class="deck-card" data-pos="right">
+              <span class="selection-check"><svg class="icon"><use href="#i-check"/></svg></span>
               <img src="./assets/wick.png" alt="灯芯旅伴形象">
               <h3>灯芯 Wick</h3>
               <div class="type">安静型旅伴</div>
               <p>“你读你的，我替你留灯。”</p>
             </article>
-            <article class="companion-card">
+            <article class="deck-card" data-pos="left">
+              <span class="selection-check"><svg class="icon"><use href="#i-check"/></svg></span>
               <img src="./assets/nubo.png" alt="努波旅伴形象">
               <h3>努波 Nubo</h3>
               <div class="type">活力型旅伴</div>
               <p>“看正文时，我会安静下来。”</p>
             </article>
           </div>
+          <div class="deck-nav">
+            <button class="deck-arrow" type="button" aria-label="上一个旅伴"><svg class="icon"><use href="#i-arrow-left"/></svg></button>
+            <div class="deck-dots"><i class="on"></i><i></i><i></i></div>
+            <button class="deck-arrow" type="button" aria-label="下一个旅伴"><svg class="icon"><use href="#i-arrow-right"/></svg></button>
+          </div>
+          <p class="deck-hint">左右滑动卡组，或点两侧箭头切换</p>
           <div class="bottom button-row">
             <button class="button">让帕利陪我出发 <svg class="icon"><use href="#i-arrow-right"/></svg></button>
             <button class="button secondary">帮我随机选一个</button>
@@ -941,7 +964,7 @@
       </section>
     </article>
 
-            <article class="frame">
+<article class="frame">
       <header class="frame-label"><span>02</span><h2>AI 首登对话</h2></header>
       <section class="screen">
         <div class="grain"></div>
@@ -1092,35 +1115,35 @@
 
     <article class="frame">
       <header class="frame-label"><span>08</span><h2>主题大陆总览</h2></header>
-      <section class="screen map-screen darkmap with-nav">
+      <section class="screen map-screen with-nav">
         <div class="grain"></div>
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
           <div class="map-copy"><div><span class="eyebrow">阅读世界 · DAY 1</span><h1 class="page-title compact">你的地图，<br>会随阅读改变。</h1><p>科学大陆排在第 1 位——你选了“科学”，它先带你走“未来世界里的真实系统”。</p></div><button class="icon-button" aria-label="查看整体地图"><svg class="icon"><use href="#i-map"/></svg></button></div>
           <div class="map-canvas">
-            <svg viewBox="0 0 360 390" role="img" aria-label="阅读世界主题大陆总览：科学大陆因兴趣匹配排在第一位并标记为你推荐，世界热点为下一站">
+            <svg viewBox="0 0 360 390" role="img" aria-label="阅读世界主题大陆总览：科学大陆因兴趣匹配排在第一位并标记为你推荐">
               <defs>
-                <linearGradient id="gradGold" x1="0.1" y1="0" x2="0.35" y2="1">
-                  <stop offset="0%" stop-color="#FFF0B8"/><stop offset="28%" stop-color="#FDC255"/>
-                  <stop offset="70%" stop-color="#E28E1E"/><stop offset="100%" stop-color="#BC6C18"/></linearGradient>
-                <linearGradient id="gradGreen" x1="0.1" y1="0" x2="0.35" y2="1">
-                  <stop offset="0%" stop-color="#DCF7A8"/><stop offset="28%" stop-color="#7ED37C"/>
-                  <stop offset="70%" stop-color="#3C9E5B"/><stop offset="100%" stop-color="#266F42"/></linearGradient>
-                <linearGradient id="gradWhite" x1="0.1" y1="0" x2="0.35" y2="1">
-                  <stop offset="0%" stop-color="#FFFFFF"/><stop offset="42%" stop-color="#F1EFEB"/>
-                  <stop offset="100%" stop-color="#BFBCB6"/></linearGradient>
-                <radialGradient id="haloGold">
-                  <stop offset="0%" stop-color="#FFC24D" stop-opacity=".30"/>
-                  <stop offset="55%" stop-color="#FFC24D" stop-opacity=".09"/>
-                  <stop offset="100%" stop-color="#FFC24D" stop-opacity="0"/></radialGradient>
-                <radialGradient id="haloGreen">
-                  <stop offset="0%" stop-color="#7BE38C" stop-opacity=".30"/>
-                  <stop offset="55%" stop-color="#7BE38C" stop-opacity=".09"/>
-                  <stop offset="100%" stop-color="#7BE38C" stop-opacity="0"/></radialGradient>
-                <radialGradient id="haloWhite">
-                  <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".30"/>
-                  <stop offset="55%" stop-color="#FFFFFF" stop-opacity=".09"/>
-                  <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+                <linearGradient id="gradAmber" x1="0.1" y1="0" x2="0.35" y2="1">
+                  <stop offset="0%" stop-color="#FCE6A8"/><stop offset="30%" stop-color="#EDBE64"/>
+                  <stop offset="72%" stop-color="#CE9337"/><stop offset="100%" stop-color="#A97424"/></linearGradient>
+                <linearGradient id="gradTeal" x1="0.1" y1="0" x2="0.35" y2="1">
+                  <stop offset="0%" stop-color="#BEEFE9"/><stop offset="30%" stop-color="#74CFC5"/>
+                  <stop offset="72%" stop-color="#3BA79C"/><stop offset="100%" stop-color="#2A857C"/></linearGradient>
+                <linearGradient id="gradSand" x1="0.1" y1="0" x2="0.35" y2="1">
+                  <stop offset="0%" stop-color="#F7EFDF"/><stop offset="40%" stop-color="#E2D4B9"/>
+                  <stop offset="100%" stop-color="#C6B594"/></linearGradient>
+                <radialGradient id="haloAmber">
+                  <stop offset="0%" stop-color="#B98A38" stop-opacity=".22"/>
+                  <stop offset="62%" stop-color="#B98A38" stop-opacity="0.06"/>
+                  <stop offset="100%" stop-color="#B98A38" stop-opacity="0"/></radialGradient>
+                <radialGradient id="haloTeal">
+                  <stop offset="0%" stop-color="#3BA79C" stop-opacity=".20"/>
+                  <stop offset="62%" stop-color="#3BA79C" stop-opacity="0.06"/>
+                  <stop offset="100%" stop-color="#3BA79C" stop-opacity="0"/></radialGradient>
+                <radialGradient id="haloSand">
+                  <stop offset="0%" stop-color="#8A7A5E" stop-opacity=".16"/>
+                  <stop offset="62%" stop-color="#8A7A5E" stop-opacity="0.06"/>
+                  <stop offset="100%" stop-color="#8A7A5E" stop-opacity="0"/></radialGradient>
                 <path id="ct1" d="M68.6 102.7 C68.0 102.6 66.2 102.5 65.8 102.6 C65.4 102.6 63.9 103.0 63.4 103.4 C63.0 103.8 61.1 106.8 60.3 107.7 C59.5 108.6 54.8 113.8 53.5 114.7 C52.1 115.6 45.2 118.8 43.7 119.1 C42.2 119.4 35.9 119.0 34.5 118.7 C33.2 118.4 27.8 116.4 26.8 115.8 C25.9 115.1 23.1 111.5 22.6 110.6 C22.0 109.7 20.3 106.0 20.3 105.0 C20.4 104.1 22.9 99.9 23.6 99.0 C24.3 98.1 28.7 94.9 29.3 94.2 C29.9 93.5 30.4 90.8 31.1 90.3 C31.7 89.8 36.6 88.2 37.7 87.9 C38.7 87.6 43.1 86.8 44.0 86.7 C44.9 86.6 48.2 86.2 48.9 86.2 C49.6 86.1 52.3 86.2 52.6 85.9 C52.9 85.5 52.6 82.6 52.8 81.9 C52.9 81.2 54.2 77.9 54.7 77.4 C55.2 76.8 58.3 75.1 59.1 74.8 C59.9 74.4 63.8 72.8 64.7 72.8 C65.5 72.8 69.0 74.6 69.9 74.8 C70.8 75.0 74.8 75.0 75.7 75.2 C76.6 75.4 79.6 77.0 80.7 77.2 C81.7 77.4 87.4 77.3 88.8 77.4 C90.1 77.6 96.4 78.6 97.5 79.0 C98.7 79.5 102.7 82.3 103.3 83.1 C103.8 83.8 104.8 87.6 104.8 88.4 C104.8 89.3 104.0 93.0 103.2 93.8 C102.5 94.5 96.7 97.4 95.9 98.0 C95.1 98.7 94.3 101.5 93.4 101.9 C92.4 102.3 85.6 102.9 84.4 103.1 C83.2 103.2 79.4 103.8 78.5 103.9 C77.7 103.9 74.3 104.0 73.5 103.9 C72.7 103.8 69.2 102.8 68.6 102.7Z"/>
                 <path id="ct2" d="M206.4 101.4 C206.1 102.0 205.4 104.6 204.8 105.0 C204.2 105.3 199.7 106.1 198.6 106.0 C197.5 106.0 192.2 104.8 191.3 104.6 C190.3 104.4 187.3 103.7 186.8 103.8 C186.3 104.0 185.2 106.2 184.7 106.5 C184.3 106.8 181.9 107.1 181.3 107.5 C180.6 107.9 177.6 111.3 176.7 111.9 C175.8 112.5 171.2 114.7 169.9 115.2 C168.6 115.8 161.6 118.5 160.0 118.8 C158.4 119.1 151.1 119.3 149.9 118.9 C148.7 118.6 145.8 114.8 145.0 114.0 C144.2 113.2 140.8 110.1 140.2 109.3 C139.7 108.5 137.9 104.8 137.9 103.9 C137.8 103.0 139.2 99.1 139.5 98.2 C139.8 97.4 140.7 93.9 141.7 93.2 C142.8 92.6 150.9 90.4 152.4 90.0 C153.9 89.6 159.2 88.6 160.2 88.4 C161.1 88.2 163.6 87.2 164.4 87.1 C165.1 87.0 169.5 87.7 170.0 87.5 C170.5 87.4 170.6 85.7 170.6 85.2 C170.7 84.7 170.9 81.8 171.1 81.1 C171.2 80.3 172.5 76.4 173.0 75.5 C173.6 74.7 176.9 70.6 177.8 70.3 C178.7 70.0 183.0 71.8 184.1 71.9 C185.2 71.9 189.8 71.1 190.9 71.1 C192.1 71.0 197.4 70.8 198.6 70.9 C199.7 71.1 204.1 72.7 205.2 73.1 C206.2 73.6 210.4 75.6 211.2 76.1 C212.1 76.7 215.1 79.6 215.5 80.3 C215.9 81.1 216.0 84.7 216.3 85.5 C216.5 86.2 218.8 89.3 218.5 90.0 C218.2 90.7 213.0 94.0 212.2 94.7 C211.4 95.3 209.1 97.6 208.6 98.2 C208.1 98.7 206.7 100.9 206.4 101.4Z"/>
                 <path id="ctr2" d="M210.1 104.5 C209.7 105.1 209.0 108.1 208.3 108.5 C207.6 108.9 202.5 109.8 201.2 109.7 C200.0 109.7 193.9 108.3 192.8 108.1 C191.8 107.9 188.3 107.0 187.7 107.2 C187.2 107.4 185.9 109.9 185.4 110.2 C184.9 110.6 182.2 110.9 181.4 111.4 C180.7 111.9 177.3 115.7 176.2 116.4 C175.2 117.1 170.0 119.6 168.5 120.2 C167.0 120.8 159.0 124.0 157.2 124.3 C155.4 124.6 147.1 124.9 145.7 124.4 C144.3 124.0 141.0 119.7 140.1 118.8 C139.2 117.9 135.3 114.4 134.7 113.5 C134.0 112.5 132.0 108.3 132.0 107.3 C131.9 106.3 133.4 101.8 133.8 100.8 C134.1 99.8 135.2 95.9 136.4 95.1 C137.5 94.4 146.8 91.9 148.5 91.4 C150.2 91.0 156.3 89.9 157.4 89.6 C158.5 89.4 161.3 88.2 162.2 88.1 C163.1 88.0 168.0 88.8 168.6 88.6 C169.2 88.5 169.2 86.6 169.3 86.0 C169.4 85.4 169.6 82.1 169.8 81.2 C170.0 80.4 171.4 75.9 172.0 75.0 C172.7 74.0 176.5 69.3 177.5 69.0 C178.5 68.7 183.5 70.7 184.7 70.8 C185.9 70.8 191.1 69.9 192.5 69.9 C193.8 69.8 199.9 69.5 201.2 69.7 C202.5 69.9 207.5 71.7 208.7 72.2 C209.8 72.7 214.7 75.0 215.6 75.6 C216.6 76.3 220.0 79.6 220.5 80.4 C220.9 81.3 221.1 85.4 221.4 86.3 C221.6 87.2 224.3 90.6 223.9 91.4 C223.5 92.3 217.6 96.0 216.7 96.7 C215.8 97.5 213.1 100.1 212.6 100.8 C212.1 101.4 210.4 103.9 210.1 104.5Z"/>
@@ -1131,79 +1154,79 @@
                 <path id="ct7" d="M195.8 330.0 C195.5 330.3 194.5 332.0 194.3 332.5 C194.1 333.0 193.7 335.9 193.3 336.3 C193.0 336.7 190.1 337.4 189.5 337.8 C188.9 338.2 186.7 340.3 186.0 340.9 C185.4 341.5 182.3 344.7 181.5 345.1 C180.6 345.5 176.4 346.0 175.5 345.9 C174.6 345.8 170.7 344.4 170.1 343.8 C169.5 343.2 167.9 339.1 167.7 338.2 C167.6 337.3 168.2 333.2 168.1 332.5 C168.1 331.9 166.9 330.4 167.0 330.0 C167.0 329.5 168.6 327.0 168.7 326.6 C168.9 326.2 168.9 325.0 168.9 324.7 C168.9 324.5 168.9 323.4 168.7 323.2 C168.4 322.9 166.8 321.9 166.3 321.5 C165.8 321.2 163.0 319.4 162.8 319.0 C162.5 318.6 163.3 317.1 163.1 316.5 C162.9 316.0 161.1 313.1 160.8 312.4 C160.5 311.6 159.1 307.5 159.2 306.7 C159.2 305.9 160.9 302.7 161.5 302.1 C162.0 301.5 165.3 299.2 166.2 299.1 C167.2 299.1 172.3 300.8 173.3 301.1 C174.3 301.5 178.1 303.6 178.9 304.0 C179.6 304.3 182.5 305.6 183.0 305.9 C183.6 306.3 185.7 308.0 186.2 308.4 C186.6 308.8 188.1 310.4 188.6 310.6 C189.1 310.9 191.7 311.0 192.1 311.3 C192.6 311.5 193.9 312.9 194.4 313.2 C194.9 313.5 197.7 314.3 197.9 314.7 C198.0 315.0 196.4 317.5 196.3 318.0 C196.2 318.4 196.4 319.9 196.6 320.3 C196.7 320.7 197.9 322.2 198.1 322.6 C198.3 323.0 198.9 324.8 199.0 325.3 C199.0 325.7 198.6 327.6 198.3 327.9 C198.1 328.3 196.2 329.6 195.8 330.0Z"/>
               </defs>
 
-              <g>
-                <ellipse cx="62" cy="100" rx="60" ry="43" fill="url(#haloGreen)"/>
-                <use href="#ct1" y="11" fill="#0D301A"/>
-                <use href="#ct1" y="7.5" fill="#194A2A"/>
-                <use href="#ct1" y="4" fill="#267041"/>
-                <use href="#ct1" fill="url(#gradGreen)" stroke="#CDF3A6" stroke-width="0.9" stroke-opacity=".4"/>
+              <g class="map-island" data-theme="science" data-name="科学" role="button" tabindex="0" aria-label="进入科学">
+                <ellipse cx="62" cy="101" rx="60" ry="43" fill="url(#haloTeal)"/>
+                <use href="#ct1" y="11" fill="#134F4B"/>
+                <use href="#ct1" y="7.5" fill="#1B6A64"/>
+                <use href="#ct1" y="4" fill="#228A82"/>
+                <use href="#ct1" fill="url(#gradTeal)" stroke="#CDF2ED" stroke-width="0.9" stroke-opacity=".55"/>
                 <text class="ct-label" x="62" y="145" text-anchor="middle">科学</text>
                 <text class="ct-count" x="62" y="159" text-anchor="middle">12 条路线</text>
               </g>
 
-              <g>
-                <ellipse cx="180" cy="100" rx="60" ry="43" fill="url(#haloGold)"/>
-                <use href="#ct2" y="11" fill="#3A1E05"/>
-                <use href="#ct2" y="7.5" fill="#653808"/>
-                <use href="#ct2" y="4" fill="#94600F"/>
-                <use href="#ct2" fill="url(#gradGold)" stroke="#FFE9A8" stroke-width="0.9" stroke-opacity=".4"/>
+              <g class="map-island" data-theme="world" data-name="世界热点" role="button" tabindex="0" aria-label="进入世界热点">
+                <ellipse cx="180" cy="101" rx="60" ry="43" fill="url(#haloAmber)"/>
+                <use href="#ct2" y="11" fill="#6E4A14"/>
+                <use href="#ct2" y="7.5" fill="#9A6B24"/>
+                <use href="#ct2" y="4" fill="#C49444"/>
+                <use href="#ct2" fill="url(#gradAmber)" stroke="#FFF0C2" stroke-width="0.9" stroke-opacity=".55"/>
                 <use href="#ctr2" class="ct-ring"/>
                 <text class="ct-label" x="180" y="145" text-anchor="middle">世界热点</text>
                 <text class="ct-count" x="180" y="159" text-anchor="middle">8 条路线</text>
               </g>
 
-              <g>
-                <ellipse cx="298" cy="100" rx="60" ry="43" fill="url(#haloGold)"/>
-                <use href="#ct3" y="11" fill="#3A1E05"/>
-                <use href="#ct3" y="7.5" fill="#653808"/>
-                <use href="#ct3" y="4" fill="#94600F"/>
-                <use href="#ct3" fill="url(#gradGold)" stroke="#FFE9A8" stroke-width="0.9" stroke-opacity=".4"/>
+              <g class="map-island" data-theme="culture" data-name="文化" role="button" tabindex="0" aria-label="进入文化">
+                <ellipse cx="298" cy="101" rx="60" ry="43" fill="url(#haloAmber)"/>
+                <use href="#ct3" y="11" fill="#6E4A14"/>
+                <use href="#ct3" y="7.5" fill="#9A6B24"/>
+                <use href="#ct3" y="4" fill="#C49444"/>
+                <use href="#ct3" fill="url(#gradAmber)" stroke="#FFF0C2" stroke-width="0.9" stroke-opacity=".55"/>
                 <text class="ct-label" x="298" y="145" text-anchor="middle">文化</text>
                 <text class="ct-count" x="298" y="159" text-anchor="middle">6 条路线</text>
               </g>
 
-              <g>
-                <ellipse cx="62" cy="220" rx="60" ry="43" fill="url(#haloGold)"/>
-                <use href="#ct4" y="11" fill="#3A1E05"/>
-                <use href="#ct4" y="7.5" fill="#653808"/>
-                <use href="#ct4" y="4" fill="#94600F"/>
-                <use href="#ct4" fill="url(#gradGold)" stroke="#FFE9A8" stroke-width="0.9" stroke-opacity=".4"/>
+              <g class="map-island" data-theme="business" data-name="商业" role="button" tabindex="0" aria-label="进入商业">
+                <ellipse cx="62" cy="221" rx="60" ry="43" fill="url(#haloAmber)"/>
+                <use href="#ct4" y="11" fill="#6E4A14"/>
+                <use href="#ct4" y="7.5" fill="#9A6B24"/>
+                <use href="#ct4" y="4" fill="#C49444"/>
+                <use href="#ct4" fill="url(#gradAmber)" stroke="#FFF0C2" stroke-width="0.9" stroke-opacity=".55"/>
                 <text class="ct-label" x="62" y="265" text-anchor="middle">商业</text>
                 <text class="ct-count" x="62" y="279" text-anchor="middle">7 条路线</text>
               </g>
 
-              <g>
-                <ellipse cx="180" cy="220" rx="60" ry="43" fill="url(#haloGold)"/>
-                <use href="#ct5" y="11" fill="#3A1E05"/>
-                <use href="#ct5" y="7.5" fill="#653808"/>
-                <use href="#ct5" y="4" fill="#94600F"/>
-                <use href="#ct5" fill="url(#gradGold)" stroke="#FFE9A8" stroke-width="0.9" stroke-opacity=".4"/>
+              <g class="map-island" data-theme="growth" data-name="成长" role="button" tabindex="0" aria-label="进入成长">
+                <ellipse cx="180" cy="221" rx="60" ry="43" fill="url(#haloAmber)"/>
+                <use href="#ct5" y="11" fill="#6E4A14"/>
+                <use href="#ct5" y="7.5" fill="#9A6B24"/>
+                <use href="#ct5" y="4" fill="#C49444"/>
+                <use href="#ct5" fill="url(#gradAmber)" stroke="#FFF0C2" stroke-width="0.9" stroke-opacity=".55"/>
                 <text class="ct-label" x="180" y="265" text-anchor="middle">成长</text>
                 <text class="ct-count" x="180" y="279" text-anchor="middle">9 条路线</text>
               </g>
 
-              <g>
-                <ellipse cx="298" cy="220" rx="60" ry="43" fill="url(#haloGold)"/>
-                <use href="#ct6" y="11" fill="#3A1E05"/>
-                <use href="#ct6" y="7.5" fill="#653808"/>
-                <use href="#ct6" y="4" fill="#94600F"/>
-                <use href="#ct6" fill="url(#gradGold)" stroke="#FFE9A8" stroke-width="0.9" stroke-opacity=".4"/>
+              <g class="map-island" data-theme="stories" data-name="趣味故事" role="button" tabindex="0" aria-label="进入趣味故事">
+                <ellipse cx="298" cy="221" rx="60" ry="43" fill="url(#haloAmber)"/>
+                <use href="#ct6" y="11" fill="#6E4A14"/>
+                <use href="#ct6" y="7.5" fill="#9A6B24"/>
+                <use href="#ct6" y="4" fill="#C49444"/>
+                <use href="#ct6" fill="url(#gradAmber)" stroke="#FFF0C2" stroke-width="0.9" stroke-opacity=".55"/>
                 <text class="ct-label" x="298" y="265" text-anchor="middle">趣味故事</text>
                 <text class="ct-count" x="298" y="279" text-anchor="middle">12 条路线</text>
               </g>
 
-              <g>
-                <ellipse cx="180" cy="328" rx="42" ry="34" fill="url(#haloWhite)"/>
-                <use href="#ct7" y="7" fill="#4C4947"/>
-                <use href="#ct7" y="4.5" fill="#6F6C68"/>
-                <use href="#ct7" y="2.5" fill="#93908B"/>
-                <use href="#ct7" fill="url(#gradWhite)" stroke="#FFFFFF" stroke-width="0.9" stroke-opacity=".4"/>
+              <g class="map-island" data-theme="more" data-name="更多大陆" role="button" tabindex="0" aria-label="进入更多大陆">
+                <ellipse cx="180" cy="329" rx="42" ry="34" fill="url(#haloSand)"/>
+                <use href="#ct7" y="7" fill="#8A7A5E"/>
+                <use href="#ct7" y="4.5" fill="#A0906F"/>
+                <use href="#ct7" y="2.5" fill="#B8A98A"/>
+                <use href="#ct7" fill="url(#gradSand)" stroke="#FBF4E6" stroke-width="0.9" stroke-opacity=".55"/>
                 <text class="ct-label" x="180" y="366" text-anchor="middle">更多大陆</text>
               </g>
 
               <g>
-                <rect x="30" y="37" width="64" height="18" rx="9" fill="rgba(123,227,140,.16)" stroke="#7BE38C" stroke-width="1"/>
-                <text x="62" y="50" text-anchor="middle" fill="#B7F0A8" font-family="inherit" font-size="9.5px" font-weight="700" letter-spacing=".3px">为你推荐</text>
+                <rect x="30" y="37" width="64" height="18" rx="9" fill="#E3F5F2" stroke="#42AFA8" stroke-width="1"/>
+                <text x="62" y="50" text-anchor="middle" fill="#1F6B66" font-family="inherit" font-size="9.5px" font-weight="700" letter-spacing=".3px">为你推荐</text>
               </g>
             </svg>
             <div class="map-legend">
@@ -1224,7 +1247,7 @@
 
     <article class="frame">
       <header class="frame-label"><span>09</span><h2>科学大陆</h2></header>
-      <section class="screen map-screen darkmap with-nav">
+      <section class="screen map-screen with-nav">
         <div class="grain"></div>
         <div class="content">
           <div class="continent-hero">
