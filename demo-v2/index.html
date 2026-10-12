@@ -968,6 +968,35 @@
     .level-card h3 { font-size: 15px; font-weight: 900; color: var(--ink-900); }
     .level-card p { margin-top: 7px; font-size: 11.5px; line-height: 1.5; color: var(--text-muted); }
 
+
+    /* ── 卡组：预告卡「更多萌宠正在生成中」 ── */
+    .deck-card.soon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 20px 18px;
+      text-align: center;
+      background: repeating-linear-gradient(135deg, #FBF4E7 0 9px, #F6EDDD 9px 18px);
+      border-style: dashed;
+      border-color: var(--line-300);
+    }
+    .deck-card.soon .soon-badge {
+      display: grid; place-items: center;
+      width: 52px; height: 52px; margin-bottom: 2px;
+      border-radius: 50%;
+      background: rgba(66, 175, 168, .14);
+      color: var(--green-600);
+    }
+    .deck-card.soon .soon-badge .icon { width: 24px; height: 24px; }
+    .deck-card.soon h3 { font-size: 16px; }
+    .deck-card.soon .type { color: var(--green-600); }
+    .deck-card.soon p { margin-top: 2px; font-size: 12px; line-height: 1.6; color: var(--text-muted); }
+
+    /* 按钮禁用态（预告卡不可选时） */
+    .button:disabled { opacity: .45; cursor: default; }
+
     /* Dynamic demo overrides */
     body { display: grid; place-items: center; min-height: 100vh; padding: 24px; overflow: auto; }
     .board-copy { display: none; }
@@ -1115,8 +1144,7 @@
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
           <div class="topbar"><span class="eyebrow">阅读世界 · 初次见面</span><button class="pill" id="skip-onboarding" type="button">跳过</button></div>
-          <h1 class="page-title">读英文时，<br>你想让谁坐在旁边？</h1>
-          <p class="lede">选谁陪你读完，不用选老师。</p>
+          <h1 class="page-title">读文章时，<br>你想让谁陪在旁边？</h1>
           <div class="deck" id="deck" role="group" tabindex="0" aria-label="旅伴卡组，可左右滑动或点两侧箭头切换">
             <article class="deck-card" data-pos="front" data-companion="pal">
               <span class="selection-check"><svg class="icon"><use href="#i-check"/></svg></span>
@@ -1139,10 +1167,24 @@
               <div class="type">活力型旅伴</div>
               <p>“看正文时，我会安静下来。”</p>
             </article>
+          
+            <article class="deck-card" data-pos="hidden" data-companion="light">
+              <span class="selection-check"><svg class="icon"><use href="#i-check"/></svg></span>
+              <img src="./assets/light.png" alt="小灯旅伴形象">
+              <h3>小灯 Light</h3>
+              <div class="type">引路型旅伴</div>
+              <p>“慢慢来，我在。”</p>
+            </article>
+            <article class="deck-card soon" data-pos="hidden" data-companion="soon">
+              <span class="soon-badge"><svg class="icon"><use href="#i-sparkles"/></svg></span>
+              <h3>更多萌宠</h3>
+              <div class="type">正在生成中</div>
+              <p>团子、毛豆还在路上——<br>它们也在等一个愿意一起读的人。</p>
+            </article>
           </div>
           <div class="deck-nav">
             <button class="deck-arrow" id="deck-prev" type="button" aria-label="上一个旅伴"><svg class="icon"><use href="#i-arrow-left"/></svg></button>
-            <div class="deck-dots" id="deck-dots"><i class="on"></i><i></i><i></i></div>
+            <div class="deck-dots" id="deck-dots"><i></i><i></i><i></i><i></i><i></i></div>
             <button class="deck-arrow" id="deck-next" type="button" aria-label="下一个旅伴"><svg class="icon"><use href="#i-arrow-right"/></svg></button>
           </div>
           <div class="bottom button-row">
@@ -1535,28 +1577,41 @@
       const deckCards = $$('.deck-card');
       const deckDots = $$('#deck-dots i');
       const deckCta = $('#companion-cta');
-      const COMPANIONS = ['pal', 'wick', 'nubo'];
-      const COMPANION_NAMES = { pal: '帕利', wick: '灯芯', nubo: '努波' };
-      let companion = { id: 'pal', name: '帕利' };
+      const COMPANIONS = ['light', 'pal', 'wick', 'nubo'];                 // 可选旅伴
+      const DECK_ORDER = ['light', 'pal', 'wick', 'nubo', 'soon'];         // 卡组展示顺序（含预告卡）
+      const COMPANION_NAMES = { light: '小灯', pal: '帕利', wick: '灯芯', nubo: '努波' };
+      let companion = { id: 'light', name: '小灯' };
       let frontIndex = 0;
 
       function renderDeck() {
+        const n = DECK_ORDER.length;
         deckCards.forEach((card) => {
-          const index = COMPANIONS.indexOf(card.dataset.companion);
-          const offset = (index - frontIndex + COMPANIONS.length) % COMPANIONS.length;
-          card.dataset.pos = offset === 0 ? 'front' : offset === 1 ? 'right' : 'left';
+          const index = DECK_ORDER.indexOf(card.dataset.companion);
+          const offset = (index - frontIndex + n) % n;
+          // 只露出 3 张：正面 + 左右各一张，其余收到 hidden（第 4 张起不再堆叠）
+          card.dataset.pos = offset === 0 ? 'front'
+                           : offset === 1 ? 'right'
+                           : offset === 2 ? 'left' : 'hidden';
         });
         deckDots.forEach((dot, index) => dot.classList.toggle('on', index === frontIndex));
-        const id = COMPANIONS[frontIndex];
+        const id = DECK_ORDER[frontIndex];
+        if (id === 'soon') {                       // 预告卡：不可选，只用来吊期待
+          companion = null;
+          if (deckCta) { deckCta.disabled = true; deckCta.innerHTML = '更多萌宠正在生成中'; }
+          return;
+        }
         companion = { id: id, name: COMPANION_NAMES[id] };
-        if (deckCta) deckCta.innerHTML = '让' + companion.name + '陪我出发 <svg class="icon"><use href="#i-arrow-right"/></svg>';
+        if (deckCta) {
+          deckCta.disabled = false;
+          deckCta.innerHTML = '让' + companion.name + '陪我出发 <svg class="icon"><use href="#i-arrow-right"/></svg>';
+        }
         $$('[data-companion-avatar]').forEach((image) => {
           image.src = './assets/' + id + '.png';
         });
       }
 
       function stepDeck(delta) {
-        frontIndex = (frontIndex + delta + COMPANIONS.length) % COMPANIONS.length;
+        frontIndex = (frontIndex + delta + DECK_ORDER.length) % DECK_ORDER.length;
         renderDeck();
       }
 
@@ -1581,14 +1636,14 @@
       });
 
       renderDeck();
-      $('#companion-cta').addEventListener('click', () => showFrame('stage-02'));
+      $('#companion-cta').addEventListener('click', () => { if (!companion) return; showFrame('stage-02'); });
       $('#skip-onboarding').addEventListener('click', () => {
         frontIndex = 0;
         renderDeck();
         showFrame('stage-02');
       });
       $('#random-companion').addEventListener('click', () => {
-        frontIndex = Math.floor(Math.random() * COMPANIONS.length);
+        frontIndex = DECK_ORDER.indexOf(COMPANIONS[Math.floor(Math.random() * COMPANIONS.length)]);
         renderDeck();
         showToast('这次让' + companion.name + '陪你出发');
         setTimeout(() => showFrame('stage-02'), 350);

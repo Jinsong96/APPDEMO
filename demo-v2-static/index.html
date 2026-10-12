@@ -976,6 +976,35 @@
     .level-card h3 { font-size: 15px; font-weight: 900; color: var(--ink-900); }
     .level-card p { margin-top: 7px; font-size: 11.5px; line-height: 1.5; color: var(--text-muted); }
 
+
+    /* ── 卡组：预告卡「更多萌宠正在生成中」 ── */
+    .deck-card.soon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 20px 18px;
+      text-align: center;
+      background: repeating-linear-gradient(135deg, #FBF4E7 0 9px, #F6EDDD 9px 18px);
+      border-style: dashed;
+      border-color: var(--line-300);
+    }
+    .deck-card.soon .soon-badge {
+      display: grid; place-items: center;
+      width: 52px; height: 52px; margin-bottom: 2px;
+      border-radius: 50%;
+      background: rgba(66, 175, 168, .14);
+      color: var(--green-600);
+    }
+    .deck-card.soon .soon-badge .icon { width: 24px; height: 24px; }
+    .deck-card.soon h3 { font-size: 16px; }
+    .deck-card.soon .type { color: var(--green-600); }
+    .deck-card.soon p { margin-top: 2px; font-size: 12px; line-height: 1.6; color: var(--text-muted); }
+
+      /* 按钮禁用态（预告卡不可选时） */
+    .button:disabled { opacity: .45; cursor: default; }
+
 </style>
 </head>
 <body>
@@ -1016,17 +1045,16 @@
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
           <div class="topbar"><span class="eyebrow">阅读世界 · 初次见面</span><span class="pill">跳过</span></div>
-          <h1 class="page-title">读英文时，<br>你想让谁坐在旁边？</h1>
-          <p class="lede">选谁陪你读完，不用选老师。</p>
+          <h1 class="page-title">读文章时，<br>你想让谁陪在旁边？</h1>
           <div class="deck">
-            <article class="deck-card" data-pos="front">
+            <article class="deck-card" data-pos="right">
               <span class="selection-check"><svg class="icon"><use href="#i-check"/></svg></span>
               <img src="./assets/pal.png" alt="帕利旅伴形象">
               <h3>帕利 Pal</h3>
               <div class="type">机灵型旅伴</div>
               <p>“我会吐槽难句，不吐槽你。”</p>
             </article>
-            <article class="deck-card" data-pos="right">
+            <article class="deck-card" data-pos="hidden">
               <span class="selection-check"><svg class="icon"><use href="#i-check"/></svg></span>
               <img src="./assets/wick.png" alt="灯芯旅伴形象">
               <h3>灯芯 Wick</h3>
@@ -1040,14 +1068,27 @@
               <div class="type">活力型旅伴</div>
               <p>“看正文时，我会安静下来。”</p>
             </article>
+<article class="deck-card" data-pos="front" data-companion="light">
+              <span class="selection-check"><svg class="icon"><use href="#i-check"/></svg></span>
+              <img src="./assets/light.png" alt="小灯旅伴形象">
+              <h3>小灯 Light</h3>
+              <div class="type">引路型旅伴</div>
+              <p>“慢慢来，我在。”</p>
+            </article>
+<article class="deck-card soon" data-pos="hidden" data-companion="soon">
+              <span class="soon-badge"><svg class="icon"><use href="#i-sparkles"/></svg></span>
+              <h3>更多萌宠</h3>
+              <div class="type">正在生成中</div>
+              <p>团子、毛豆还在路上——<br>它们也在等一个愿意一起读的人。</p>
+            </article>
           </div>
           <div class="deck-nav">
             <button class="deck-arrow" type="button" aria-label="上一个旅伴"><svg class="icon"><use href="#i-arrow-left"/></svg></button>
-            <div class="deck-dots"><i class="on"></i><i></i><i></i></div>
+            <div class="deck-dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
             <button class="deck-arrow" type="button" aria-label="下一个旅伴"><svg class="icon"><use href="#i-arrow-right"/></svg></button>
           </div>
           <div class="bottom button-row">
-            <button class="button">让帕利陪我出发 <svg class="icon"><use href="#i-arrow-right"/></svg></button>
+            <button class="button">让小灯陪我出发 <svg class="icon"><use href="#i-arrow-right"/></svg></button>
             <button class="button secondary">帮我随机选一个</button>
           </div>
         </div>
