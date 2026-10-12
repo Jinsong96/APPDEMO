@@ -324,6 +324,13 @@
     .typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--brown-500); opacity: .55; }
     .tiny-note { display: flex; align-items: center; gap: 7px; margin-top: 10px; color: var(--text-muted); font-size: 11px; font-weight: 800; }
 
+    /* 返回按钮：统一头部布局 */
+    .topbar .eyebrow { flex: 1; }
+    .hero-head { display: flex; align-items: center; gap: 10px; margin-top: 2px; }
+    .hero-head .eyebrow { flex: 1; }
+    .continent-hero .back { border-color: rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .1); color: #FFF6E9; }
+    .topbar:has(.back) .eyebrow { padding-left: 2px; }
+
     /* 选择旅伴 · 滑动卡组 */
     .deck {
       position: relative;
@@ -386,7 +393,6 @@
     .deck-dots { display: flex; align-items: center; gap: 7px; }
     .deck-dots i { display: block; width: 7px; height: 7px; border-radius: 999px; background: #D3BE9C; transition: width 220ms ease, background 220ms ease; }
     .deck-dots i.on { width: 20px; background: var(--brand-primary); }
-    .deck-hint { margin: 11px 0 0; text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 700; }
     @media (prefers-reduced-motion: reduce) {
       .deck-card, .deck-dots i, .deck-arrow { transition: none; }
     }
@@ -799,7 +805,7 @@
     .continent-hero {
       margin: -26px -22px 0;
       padding: 28px 22px 22px;
-      min-height: 300px;
+      min-height: 218px;
       border-radius: 0 0 38px 38px;
       background: linear-gradient(150deg, #3C2B22 0%, #73513A 100%);
       color: white;
@@ -1017,7 +1023,7 @@
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
           <div class="topbar"><span class="eyebrow">阅读世界 · 初次见面</span><button class="pill" id="skip-onboarding" type="button">跳过</button></div>
           <h1 class="page-title">读英文时，<br>你想让谁坐在旁边？</h1>
-          <p class="lede">不是选老师，是选一种陪你读完的方式。</p>
+          <p class="lede">选谁陪你读完，不用选老师。</p>
           <div class="deck" id="deck" role="group" tabindex="0" aria-label="旅伴卡组，可左右滑动或点两侧箭头切换">
             <article class="deck-card" data-pos="front" data-companion="pal">
               <span class="selection-check"><svg class="icon"><use href="#i-check"/></svg></span>
@@ -1046,7 +1052,6 @@
             <div class="deck-dots" id="deck-dots"><i class="on"></i><i></i><i></i></div>
             <button class="deck-arrow" id="deck-next" type="button" aria-label="下一个旅伴"><svg class="icon"><use href="#i-arrow-right"/></svg></button>
           </div>
-          <p class="deck-hint">左右滑动卡组，或点两侧箭头切换</p>
           <div class="bottom button-row">
             <button class="button" id="companion-cta" type="button">让帕利陪我出发 <svg class="icon"><use href="#i-arrow-right"/></svg></button>
             <button class="button secondary" id="random-companion" type="button">帮我随机选一个</button>
@@ -1061,13 +1066,12 @@
         <div class="grain"></div>
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
-          <div class="topbar"><span class="eyebrow" id="onboard-step">帕利 · 初次见面 · 1 / 2</span><button class="pill" id="skip-chat" type="button">跳过</button></div>
+          <div class="topbar"><button class="back" id="back-02" type="button" aria-label="返回上一页"><svg class="icon"><use href="#i-arrow-left"/></svg></button><span class="eyebrow" id="onboard-step">帕利 · 初次见面 · 1 / 2</span><button class="pill" id="skip-chat" type="button">跳过</button></div>
           <h1 class="chat-hello"><img src="./assets/pal.png" alt="" data-companion-avatar>嗨！</h1>
           <div class="chat-flow" id="chat-flow">
-            <div class="turn"><p>我会问你两个简短的问题，好知道该用哪种方式带你。</p></div>
           </div>
           <div class="quick-row" id="quick-row"></div>
-          <div class="composer">也可以直接打字…<button class="send" type="button" aria-label="发送"><svg class="icon"><use href="#i-arrow-right"/></svg></button></div>
+          <div class="composer"><button class="send" type="button" aria-label="发送"><svg class="icon"><use href="#i-arrow-right"/></svg></button></div>
         </div>
       </section>
     </article>
@@ -1078,11 +1082,10 @@
         <div class="grain"></div>
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
-          <div class="topbar"><span class="eyebrow">阅读世界 · 正在定制</span><span class="pill">请稍等</span></div>
+          <div class="topbar"><button class="back" id="back-03" type="button" aria-label="返回上一页"><svg class="icon"><use href="#i-arrow-left"/></svg></button><span class="eyebrow">阅读世界 · 正在定制</span></div>
           <div class="loading-wrap">
             <div class="pal-halo"><img src="./assets/pal.png" alt="帕利正在为你定制" data-companion-avatar></div>
             <h1 class="loading-title">帕利在读你的兴趣</h1>
-            <p class="loading-copy">正在根据你的兴趣，在六个主题大陆里为你排出第一条路线。</p>
             <div class="progress-track"><i id="loading-bar"></i></div>
             <div class="progress-meta"><span id="loading-pct">已匹配 0%</span><span>预计还要几秒</span></div>
             <div class="step-list">
@@ -1091,7 +1094,6 @@
               <div class="step-row pending" id="step-c"><span class="mark"><svg class="icon"><use href="#i-check"/></svg></span><p><b>正在生成你的第一份专属推荐…</b></p></div>
             </div>
           </div>
-          <div class="bottom"><p class="loading-foot">定制完成后会自动打开你的推荐</p></div>
         </div>
       </section>
     </article>
@@ -1102,18 +1104,17 @@
         <div class="grain"></div>
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
-          <div class="topbar"><span class="eyebrow">已理解你的兴趣 · 推荐 1/1</span><button class="pill" id="recommend-more" type="button">换一条</button></div>
+          <div class="topbar"><button class="back" id="back-04" type="button" aria-label="返回上一页"><svg class="icon"><use href="#i-arrow-left"/></svg></button><span class="eyebrow">已理解你的兴趣 · 推荐 1/1</span><button class="pill" id="recommend-more" type="button">换一条</button></div>
           <h1 class="page-title compact">我先带你去<br>现实边缘的未来。</h1>
-          <p class="lede" id="rec-lede">这篇正好落在你选的「科学」上，长度也按你选的「接受一点挑战」配好了。</p>
           <article class="card recommend-card">
             <div class="story-cover" id="story-cover" data-code="47"></div>
             <div class="story-route-line" id="rec-route-line"><span class="tag teal">科学大陆</span><span class="sep"></span><span class="tag">火星系列 · 当城市失效</span><span class="sep"></span><span class="tag coral">第 1 / 4 段</span></div>
             <h2 id="rec-title">火星城市停电的第 47 分钟</h2>
-            <p class="story-synopsis" id="rec-synopsis">一座城市突然停电，旧维修机器人带着玛拉穿过一个不再依赖中心网络的隧道。这不是火星冒险，而是城市系统失效后，人如何重新连接的故事。</p>
+            <p class="story-synopsis" id="rec-synopsis">一座城市突然停电，旧维修机器人带着玛拉穿过一条不靠中心网络的隧道。</p>
             <div class="unlock-line" id="rec-unlock"><svg class="icon"><use href="#i-map"/></svg><span>读完本段：解锁“第 48 分钟”，点亮科学大陆第 1 段海岸线</span></div>
             <div class="reason-box">
               <svg class="icon"><use href="#i-sparkles"/></svg>
-              <span id="rec-reason">推荐原因：你选了「科学」，这篇落在“未来世界里的真实系统”，只需 4 分钟，只会在关键处打扰你。</span>
+              <span id="rec-reason">这个系列写的是“未来世界里的真实系统”。4 分钟，只在你需要时出现。</span>
             </div>
           </article>
           <div class="bottom button-row">
@@ -1130,7 +1131,7 @@
         <div class="grain"></div>
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
-          <div class="reader-head"><button class="back" id="reader-close-1" type="button" aria-label="关闭阅读"><svg class="icon"><use href="#i-arrow-left"/></svg></button><div class="progress"><i style="width:36%"></i></div><strong style="font-size:12px">2:18</strong></div>
+          <div class="reader-head"><button class="back" id="reader-close-1" type="button" aria-label="返回上一页"><svg class="icon"><use href="#i-arrow-left"/></svg></button><div class="progress"><i style="width:36%"></i></div><strong style="font-size:12px">2:18</strong></div>
           <div class="topbar"><span class="eyebrow">阅读世界 · 科学大陆 · 1/4</span><span class="pill">轻提示</span></div>
           <h1 class="reader-title">The 47th Minute<br>Without Power</h1>
           <div class="reader-meta">MARS CITY · A 4-MINUTE STORY</div>
@@ -1160,15 +1161,15 @@
         <div class="grain"></div>
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
+          <div class="topbar"><button class="back" id="back-06" type="button" aria-label="返回上一页"><svg class="icon"><use href="#i-arrow-left"/></svg></button></div>
           <span class="stamp">FIRST ROUTE</span>
           <h1 class="page-title">你读完了。<br>帕利也留下了第一段路线。</h1>
-          <p class="lede">这不是奖励，而是你们下一次会怎么继续。</p>
+          <p class="lede">下一段，从这里接着走。</p>
           <div class="growth-card">
             <span class="eyebrow">本次留下</span>
             <h2>“现实边缘的未来故事”</h2>
-            <p>帕利把你刚才的表达和这篇阅读连在了一起。</p>
             <img src="./assets/pal.png" alt="帕利成长状态" data-companion-avatar>
-            <div class="remember-box">它记住了：你喜欢未来设定，但希望故事落在真实问题上。下一次，它会优先推荐“科学”和“世界热点”。<br><br>已点亮：科学大陆第 1 段海岸线。</div>
+            <div class="remember-box">已点亮：科学大陆第 1 段海岸线。</div>
           </div>
           <div class="bottom button-row"><button class="button teal" id="feedback-next" type="button">看看它怎样理解你 <svg class="icon"><use href="#i-arrow-right"/></svg></button></div>
         </div>
@@ -1181,8 +1182,8 @@
         <div class="grain"></div>
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
-          <div class="topbar"><button class="back" id="profile-back" type="button" aria-label="返回"><svg class="icon"><use href="#i-arrow-left"/></svg></button><span class="eyebrow">初步阅读画像</span></div>
-          <h1 class="page-title compact">这不是等级，<br>是今晚怎么陪你。</h1>
+          <div class="topbar"><button class="back" id="profile-back" type="button" aria-label="返回上一页"><svg class="icon"><use href="#i-arrow-left"/></svg></button><span class="eyebrow">初步阅读画像</span></div>
+          <h1 class="page-title compact">没有等级，<br>只有今晚怎么陪你。</h1>
           <section class="profile-hero">
             <span class="stamp">JUST RIGHT</span>
             <h2>短篇原版 · 先给线索</h2>
@@ -1220,7 +1221,8 @@
         <div class="grain"></div>
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
-          <div class="map-copy"><div><span class="eyebrow">阅读世界 · DAY 1</span><h1 class="page-title compact">你的地图，<br>会随阅读改变。</h1><p id="map-lede">科学大陆排在第 1 位——你选了「科学」，它先带你走“未来世界里的真实系统”。</p></div><button class="icon-button" id="view-map" type="button" aria-label="查看整体地图"><svg class="icon"><use href="#i-map"/></svg></button></div>
+          <div class="topbar"><button class="back" id="back-08" type="button" aria-label="返回上一页"><svg class="icon"><use href="#i-arrow-left"/></svg></button><span class="eyebrow">阅读世界 · DAY 1</span></div>
+          <div class="map-copy"><div><h1 class="page-title compact">你的地图，<br>跟着阅读一段段亮起来。</h1><p id="map-lede">科学大陆排在第 1 位——你选了「科学」，它先带你走“未来世界里的真实系统”。</p></div><button class="icon-button" id="view-map" type="button" aria-label="查看整体地图"><svg class="icon"><use href="#i-map"/></svg></button></div>
           <div class="map-canvas">
             <svg viewBox="0 0 360 390" role="img" aria-label="阅读世界主题大陆总览：科学大陆因兴趣匹配排在第一位并标记为你推荐">
               <defs>
@@ -1353,9 +1355,8 @@
         <div class="content">
           <div class="continent-hero">
             <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
-            <span class="eyebrow" style="color:#F0B888">科学大陆 · SCIENCE CONTINENT</span>
+            <div class="hero-head"><button class="back" id="back-09" type="button" aria-label="返回上一页"><svg class="icon"><use href="#i-arrow-left"/></svg></button><span class="eyebrow" style="color:#F0B888">科学大陆 · SCIENCE CONTINENT</span></div>
             <h1>把真实世界，<br>走成一条故事线。</h1>
-            <p>按你现在的兴趣排序，火星之后会继续走向真实航天与城市网络。</p>
             <div class="continent-orbit"></div>
           </div>
           <div class="section-label"><h3>你的故事路线</h3><span class="pill">3 个节点</span></div>
@@ -1381,7 +1382,7 @@
         <div class="grain"></div>
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
-          <div class="reader-head"><button class="back" id="reader-close-2" type="button" aria-label="关闭阅读"><svg class="icon"><use href="#i-arrow-left"/></svg></button><div class="progress"><i style="width:62%"></i></div><strong style="font-size:12px">1:32</strong></div>
+          <div class="reader-head"><button class="back" id="reader-close-2" type="button" aria-label="返回上一页"><svg class="icon"><use href="#i-arrow-left"/></svg></button><div class="progress"><i style="width:62%"></i></div><strong style="font-size:12px">1:32</strong></div>
           <div class="topbar"><span class="eyebrow">阅读世界 · 科学大陆 · 2/4</span><span class="pill">背景知识</span></div>
           <h1 class="reader-title">The 48th Minute<br>After the Blackout</h1>
           <div class="reader-meta">SCIENCE · CONTINUING STORY</div>
@@ -1412,11 +1413,10 @@
         <div class="grain"></div>
         <div class="content">
           <div class="statusbar"><span>9:41</span><span class="signal">● ● ▰</span></div>
-          <div class="topbar"><button class="back" id="report-back" type="button" aria-label="返回"><svg class="icon"><use href="#i-arrow-left"/></svg></button><span class="eyebrow">成长报告 · 科学大陆</span></div>
+          <div class="topbar"><button class="back" id="report-back" type="button" aria-label="返回上一页"><svg class="icon"><use href="#i-arrow-left"/></svg></button><span class="eyebrow">成长报告 · 科学大陆</span></div>
           <section class="report-hero" style="margin-top:16px">
             <span class="stamp">ROUTE COMPLETE</span>
-            <h2>你不是读完了，<br>你和帕利多了一段经历。</h2>
-            <p>这页把故事中的新词、金句、背景知识和旅伴变化留在一起。</p>
+            <h2>这一趟，<br>你和帕利多了一段经历。</h2>
           </section>
           <div class="report-grid">
             <article class="report-card">
@@ -1604,7 +1604,7 @@
             ['成长', 'i-growth'],
             ['趣味故事', 'i-quote']
           ],
-          replies: ['收到，{pick}。我先把科学大陆排在你的第一位。'],
+          replies: ['{pick}是吧。那我把科学大陆排在最前面。'],
           store: (value) => { pickedThemes = [value]; }
         },
         {
@@ -1680,7 +1680,6 @@
       const stepB = $('#step-b');
       const stepC = $('#step-c');
       const stepAText = $('#step-a-text');
-      const recLede = $('#rec-lede');
       const recReason = $('#rec-reason');
       const mapLede = $('#map-lede');
       let loadingTimer = null;
@@ -1697,8 +1696,7 @@
         const themes = currentThemes();
         const joined = themes.join('、');
         if (stepAText) stepAText.innerHTML = '<b>读懂你选的方向：</b>' + joined;
-        if (recLede) recLede.textContent = '这篇正好落在你选的「' + joined + '」上，长度也按你选的「' + currentPace() + '」配好了。';
-        if (recReason) recReason.textContent = '推荐原因：你选了「' + joined + '」，这篇落在“未来世界里的真实系统”，只需 4 分钟，只会在关键处打扰你。';
+        if (recReason) recReason.textContent = '这个系列写的是“未来世界里的真实系统”。4 分钟，只在你需要时出现。';
         if (mapLede) mapLede.textContent = '科学大陆排在第 1 位——你刚选了「' + joined + '」，它先带你走“未来世界里的真实系统”。';
       }
 
@@ -1777,7 +1775,6 @@
       });
       $('#recommend-swap').addEventListener('click', () => {
         renderStory((storyIndex + 1) % stories.length);
-        showToast('同兴趣方向，换一条更合适的故事');
       });
       $('#recommend-cta').addEventListener('click', () => showFrame('stage-05'));
 
@@ -1790,14 +1787,12 @@
       $('#font-1').addEventListener('click', () => reader1.classList.toggle('large'));
       $('#sentence-1').addEventListener('click', () => {
         aiNote1.innerHTML = '<div><strong>帕利帮你拆开长句</strong><p>Then an old repair robot emerged from a tunnel under the street. → 然后，一个旧维修机器人从街道下方的隧道里出现了。</p></div>';
-        showToast('长句已用帕利的方式拆开');
       });
       $('#ask-1').addEventListener('click', () => {
         aiNote1.innerHTML = '<div><strong>问帕利 · emerged</strong><p>它更像“从看不见的地方慢慢显现”，不只是 came out。</p></div>';
-        showToast('帕利回答了 emerged');
       });
       $('#word-mark-1').addEventListener('click', () => {
-        showToast('emerged 的线索已经放到屏幕底部');
+        aiNote1.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
       $('#complete-reading-1').addEventListener('click', () => showFrame('stage-06'));
       $('#feedback-next').addEventListener('click', () => showFrame('stage-07'));
@@ -1852,7 +1847,7 @@
           }
         });
       });
-      $('#view-map').addEventListener('click', () => showToast('整体地图 = 阅读世界的六个主题岛'));
+      $('#view-map').addEventListener('click', () => showToast('六个主题大陆，读完一个亮一个'));
       $('#continue-science').addEventListener('click', () => showFrame('stage-09'));
       $('#view-all-map').addEventListener('click', () => showToast('整体地图 = 阅读世界的六个主题岛'));
 
@@ -1895,6 +1890,12 @@
       }
 
       $('#report-back').addEventListener('click', goBack);
+
+      // 02/03/04/06/08/09 六屏的返回按钮统一绑定 goBack
+      ['back-02', 'back-03', 'back-04', 'back-06', 'back-08', 'back-09'].forEach((id) => {
+        const button = document.getElementById(id);
+        if (button) button.addEventListener('click', goBack);
+      });
       $('#report-map').addEventListener('click', () => showFrame('stage-08'));
       $('#report-next').addEventListener('click', () => {
         completeSecondNode();
