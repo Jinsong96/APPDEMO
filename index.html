@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>英语阅读旅伴 · App 原型</title>
+<style>
+  * { box-sizing: border-box; }
+  html { color-scheme: dark; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 32px 20px;
+    background: radial-gradient(125% 82% at 50% -6%, #2C2724 0%, #191614 44%, #0B0A09 100%);
+    color: #F6F1E7;
+    font-family: "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { width: 100%; max-width: 720px; }
+  .eyebrow {
+    margin: 0 0 14px;
+    color: #C3A169;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+  }
+  h1 { margin: 0; font-size: 34px; line-height: 1.22; letter-spacing: -.8px; }
+  .lede { margin: 14px 0 0; max-width: 520px; color: #9C9184; font-size: 14px; line-height: 1.7; }
+  .cards { display: grid; gap: 14px; margin-top: 34px; }
+  a.card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 22px;
+    border: 1px solid rgba(255, 246, 233, .16);
+    border-radius: 20px;
+    background: rgba(255, 246, 233, .055);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 180ms, background 180ms, transform 180ms;
+  }
+  a.card:hover { border-color: rgba(240, 212, 155, .5); background: rgba(255, 246, 233, .1); transform: translateY(-2px); }
+  a.card:focus-visible { outline: 3px solid rgba(240, 212, 155, .6); outline-offset: 3px; }
+  .card h2 { margin: 0 0 6px; font-size: 17px; letter-spacing: .2px; }
+  .card p { margin: 0; color: #9C9184; font-size: 12.5px; line-height: 1.6; }
+  .card .tag {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border: 1px solid rgba(123, 227, 140, .5);
+    border-radius: 999px;
+    color: #B7F0A8;
+    font-size: 10px;
+    font-weight: 700;
+    vertical-align: 2px;
+  }
+  .card .go {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #D8674C;
+    color: #FFF6E9;
+    font-size: 17px;
+    font-weight: 700;
+  }
+  .foot { margin: 30px 0 0; color: #6F665C; font-size: 11.5px; line-height: 1.7; }
+  @media (prefers-reduced-motion: reduce) { a.card { transition: none; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="eyebrow">Read Pal · English Reading Companion</p>
+    <h1>英语阅读旅伴 · App 原型</h1>
+    <p class="lede">选旅伴 → 对话式兴趣采集 → 定制推荐 → 阅读陪读 → 主题大陆 → 成长报告，共 11 屏。两个版本内容一致，动态版可直接点。</p>
+
+    <div class="cards">
+      <a class="card" href="./demo-v2/index.html">
+        <div>
+          <h2>动态交互版<span class="tag">推荐</span></h2>
+          <p>完整可点流程：对话式首登真的会发送消息、定制进度条真的会跑、主题大陆可以点进去。</p>
+        </div>
+        <span class="go" aria-hidden="true">→</span>
+      </a>
+      <a class="card" href="./demo-v2-static/index.html">
+        <div>
+          <h2>静态评审版</h2>
+          <p>11 屏并排铺开，适合一次性看完整流程与视觉规范，方便截图和评审。</p>
+        </div>
+        <span class="go" aria-hidden="true">→</span>
+      </a>
+    </div>
+
+    <p class="foot">建议在手机或窄窗口下查看单屏效果；两个版本均已同步至最新设计。</p>
+  </div>
+</body>
+</html>
